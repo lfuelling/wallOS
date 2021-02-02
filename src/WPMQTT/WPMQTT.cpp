@@ -1,8 +1,9 @@
 #include "WPMQTT.h"
 
-WPMQTT::WPMQTT(WiFiClient wifi, WPBME280 *bme280)
+WPMQTT::WPMQTT(WiFiClient wifi, WPBME280 *bme)
 {
     client = new PubSubClient(wifi);
+    bme280 = bme;
 }
 
 void WPMQTT::begin()

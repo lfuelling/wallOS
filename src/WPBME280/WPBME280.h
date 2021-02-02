@@ -15,10 +15,13 @@ class WPBME280
     // bme280 metrics
     float temperature, humidity, pressure, altitude;
 
+    bool started = false;
+
 public:
     WPBME280();
     void begin();
     void debugLoop();
+    bool isStarted();
     float getTemperature();
     float getHumidity();
     float getPressure();

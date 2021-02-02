@@ -18,6 +18,12 @@ void WPBME280::begin()
             ; // block further execution
 #endif
     }
+    delay(20);
+    started = true;
+}
+
+bool WPBME280::isStarted() {
+    return started == true;
 }
 
 float WPBME280::getTemperature()
