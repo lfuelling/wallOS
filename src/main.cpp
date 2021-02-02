@@ -50,7 +50,7 @@ void setup()
   while (WiFi.status() != WL_CONNECTED)
   {
 #ifdef _debug
-    Serial.print("Connecting to ");
+    Serial.print("[WiFi] Connecting to ");
     Serial.print(WIFI_SSID);
     Serial.println("...");
     delay(800);
@@ -64,10 +64,10 @@ void setup()
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo))
   {
-    Serial.println("Failed to get time using NTP!");
+    Serial.println("[NTP] Failed to get time using NTP!");
     return;
   }
-  Serial.print("NTP Synced: ");
+  Serial.print("[NTP] Synced: ");
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
 #endif
 

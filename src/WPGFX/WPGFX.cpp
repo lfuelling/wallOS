@@ -1,4 +1,5 @@
 #include "WPGFX.h"
+#include "ScreenUtils.h"
 
 WPGFX::WPGFX(WPBME280 *bme)
 {
@@ -18,9 +19,9 @@ void WPGFX::begin()
     touch->begin();
 #ifdef _debug
     // Resolution of the display
-    Serial.print("tftx =");
+    Serial.print("[TFT] X=");
     Serial.print(tft->width());
-    Serial.print("tfty =");
+    Serial.print(" Y=");
     Serial.println(tft->height());
 #endif
     tsx = 0;
@@ -40,39 +41,16 @@ void WPGFX::printError(String error)
 // from the touchscreen
 void WPGFX::handleGraphics()
 {
-    TS_Point p;
-    p = touch->getPoint();
-    // read current data
-    tsxraw = p.x;
-
-    //x and y as raw values
-    tsyraw = p.y;
-    delay(1);
-
-    // determine the orientation screen
-    uint8_t red = tft->getRotation();
-    // relative screen positions depending on the orientation
-    // determine
-    switch (red)
-    {
-    case 0:
-        tsx = map(tsyraw, TS_MINY, TS_MAXY, 240, 0);
-        tsy = map(tsxraw, TS_MINX, TS_MAXX, 0, 320);
-        break;
-    case 1:
-        tsx = map(tsxraw, TS_MINX, TS_MAXX, 0, 320);
-        tsy = map(tsyraw, TS_MINY, TS_MAXX, 0, 240);
-        break;
-    case 2:
-        tsx = map(tsyraw, TS_MINY, TS_MAXY, 0, 240);
-        tsy = map(tsxraw, TS_MINX, TS_MAXX, 320, 0);
-        break;
-    case 3:
-        tsx = map(tsxraw, TS_MINX, TS_MAXX, 320, 0);
-        tsy = map(tsyraw, TS_MINY, TS_MAXY, 240, 0);
-        break;
+#ifdef _debug
+    if(touch->touched()) {
+        TS_Point p = ScreenUtils().getTouchPosition(tft, touch);
+        Serial.print("Drawing touch circle at ");
+        Serial.print(p.x);
+        Serial.print(",");
+        Serial.println(p.y);
+        tft->drawCircle(p.x, p.y, 8, ILI9341_GREEN);
     }
-
+#endif
     redrawIfNecessary();
 }
 

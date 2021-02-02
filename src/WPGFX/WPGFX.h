@@ -16,10 +16,6 @@
 
 // defines for touchscreen
 #define ILI9341_ULTRA_DARKGREY 0x632C
-#define TS_MINX 230
-#define TS_MINY 350
-#define TS_MAXX 3700
-#define TS_MAXY 3900
 #define HAVE_TOUCHPAD
 
 class WPGFX
