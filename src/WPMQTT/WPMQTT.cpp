@@ -11,7 +11,7 @@ void WPMQTT::begin()
     client->setServer(MQTT_SERVER_IP, MQTT_SERVER_PORT);
     client->setCallback([&](char *topic, byte *message, unsigned int length) {
 #ifdef _debug
-        Serial.print("MQTT message arrived on topic: ");
+        Serial.print("[MQTT] Message arrived on topic: ");
         Serial.print(topic);
         Serial.print(". Message: ");
 
@@ -28,7 +28,7 @@ void WPMQTT::begin()
         if (String(topic) == MQTT_COMMAND_TOPIC)
         {
 #ifdef _debug
-            Serial.print("MQTT command received: ");
+            Serial.print("[MQTT] Command received: ");
             Serial.println(messageTemp);
 #endif
 
@@ -47,16 +47,16 @@ void WPMQTT::reconnect()
         if (client->connect("Wandpanel"))
         {
 #ifdef _debug
-            Serial.println("MQTT (re-)connected!");
+            Serial.println("[MQTT] (Re-)Connected!");
 #endif
             client->subscribe(MQTT_COMMAND_TOPIC);
         }
         else
         {
 #ifdef _debug
-            Serial.print("MQTT failed, rc=");
+            Serial.print("[MQTT] Connect failed, rc=");
             Serial.print(client->state());
-            Serial.println(" try again in 5 seconds");
+            Serial.println(" trying again in 5 seconds...");
 #endif
             delay(MQTT_CONNECT_COOLDOWN);
         }
