@@ -1,0 +1,46 @@
+#ifndef WP_CONFIG_H
+#define WP_CONFIG_H
+
+/////////////////// MAIN CONFIG OPTIONS ///////////////////
+
+// BME280 Settings
+#define SEALEVELPRESSURE_HPA (1013.25)
+
+// WiFi settings
+#define WIFI_SSID "wifiname"
+#define WIFI_PASSWORD "wifipassword"
+
+// MQTT settings
+#define MQTT_SERVER_IP IPAddress(192, 168, 1, 101)
+#define MQTT_SERVER_PORT 1883
+#define MQTT_USERAME "mqttusername"
+#define MQTT_PASSWORD "mqttpassword"
+#define MQTT_CONNECT_COOLDOWN 2000
+#define MQTT_COMMAND_TOPIC "esp32/command"
+#define MQTT_COMMAND_OUTPUT_TOPIC "esp32/command/out"
+
+/////////////////// PIN CONFIG OPTIONS ///////////////////
+
+// Touch sensor pins
+#define TOUCH_CS 14
+#define TOUCH_IRQ 27
+
+// TFT pins
+#define TFT_CS 5
+#define TFT_DC 4
+#define TFT_MOSI 23
+#define TFT_CLK 18
+#define TFT_RST 22
+#define TFT_MISO 19
+#define TFT_LED 15
+
+// BME280 pins
+#define BME280_SDA 26
+#define BME280_SCL 25
+
+/////////////////// MISC CONFIG OPTIONS ///////////////////
+
+// This will be changed when there's time (and a need)
+#define WP_VERSION "0.0-pre"
+
+#endif
