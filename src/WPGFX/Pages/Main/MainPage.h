@@ -16,7 +16,11 @@ class MainPage
     XPT2046_Touchscreen *touch;
     ScreenUtils utils;
 
+    // current page (0 means main menu)
+    int currentPage = 0;
+
     void drawSettingsButton(int w, int h);
+    void drawBackButton(int w, int h);
 
 public:
     MainPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor);

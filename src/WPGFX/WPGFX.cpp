@@ -98,16 +98,7 @@ void WPGFX::draw_screen(uint8_t red)
 
     drawStatusBar();
 
-    switch (currentPage)
-    {
-    case 1:
-        //TODO: draw settings
-        break;
-    case 0:
-    default:
-        mainPage->drawMainPage();
-        break;
-    }
+    mainPage->drawMainPage();
 }
 
 // Display the boot screen

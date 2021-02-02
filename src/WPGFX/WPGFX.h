@@ -24,8 +24,6 @@ class WPGFX
 
     // current location
     int tsx, tsy, tsxraw, tsyraw;
-    // current page (0 means main menu)
-    int currentPage = 0;
     // current touch state
     bool tsdown = false;
     // current screen orientation
