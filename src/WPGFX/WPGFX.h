@@ -44,6 +44,7 @@ class WPGFX
     // last shown temperature string
     String lastTemperature = "";
 
+    void redrawIfNecessary();
     void drawStatusBar();
     String getCurrentTime();
     String getSignalStrength();

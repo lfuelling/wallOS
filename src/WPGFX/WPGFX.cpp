@@ -73,18 +73,40 @@ void WPGFX::handleGraphics()
         break;
     }
 
-    // update touch state
-    if (touch->touched() != tsdown)
-    {
+    redrawIfNecessary();
+}
+
+void WPGFX::redrawIfNecessary()
+{
+    bool timeChanged = lastShownTime != getCurrentTime();
+    bool signalChanged = lastSignalString != getSignalStrength();
+    bool touchStateChanged = touch->touched() != tsdown;
+
+    if(touchStateChanged) {
         tsdown = touch->touched();
     }
 
-    if (lastShownTime != getCurrentTime()          // if time changed
-        || lastSignalString != getSignalStrength() // OR the signal strength changed
-        || touch->touched() != tsdown)             // OR the touch state changed
+    if (timeChanged || signalChanged || touchStateChanged)
     {
         // redraw the screen
         draw_screen(rotation);
+
+#ifdef _debug
+        Serial.print("[GFX] Redraw cause(s): ");
+        if (timeChanged)
+        {
+            Serial.print("time ");
+        }
+        if (signalChanged)
+        {
+            Serial.print("signal ");
+        }
+        if (touchStateChanged)
+        {
+            Serial.print("touch ");
+        }
+        Serial.println();
+#endif
     }
 }
 
