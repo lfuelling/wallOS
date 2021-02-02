@@ -70,7 +70,7 @@ void MainPage::drawSettingsButton(int w, int h)
     int x1 = 8;
     int y1 = h - 90;
     int btnWidth = 90;
-    int btnHeight = 70;
+    int btnHeight = 82;
     int x2 = x1 + btnWidth;
     int y2 = y1 + btnHeight;
 
@@ -87,6 +87,6 @@ void MainPage::drawSettingsButton(int w, int h)
     // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
     tft->setTextColor(ILI9341_WHITE, buttonColor);
-    tft->setCursor(18, h - 50);
+    tft->setCursor(x1 + (btnWidth / 2) - 32, y1 + (btnHeight / 2) + 6);
     tft->print("Settings");
 }
