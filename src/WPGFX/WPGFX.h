@@ -1,14 +1,15 @@
+#include <WiFi.h>
+#include <debug.h>
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
-#include <debug.h>
-#include <WiFi.h>
 #include <XPT2046_Touchscreen.h>
-#include <fonts/FreeSans9pt7b.h>
-#include <fonts/FreeMono9pt7b.h>
+#include "Fonts/FreeSans9pt7b.h"
+#include "Fonts/FreeMono9pt7b.h"
+#include "Fonts/Gidugu10pt7b.h"
+#include "Fonts/Electrolize9pt7b.h"
 #include "../config.h"
 #include "../WPBME280/WPBME280.h"
-#include "Gidugu10pt7b.h"
-#include "Electrolize9pt7b.h"
+#include "Pages/Main/MainPage.h"
 
 #ifndef WPGFX_H
 #define WPGFX_H
@@ -23,9 +24,7 @@
 
 class WPGFX
 {
-    Adafruit_ILI9341 *tft;
-    XPT2046_Touchscreen *touch;
-    WPBME280 *bme280;
+    MainPage *mainPage;
 
     // current location
     int tsx, tsy, tsxraw, tsyraw;
@@ -51,6 +50,10 @@ class WPGFX
     String getTemperature();
 
 public:
+    Adafruit_ILI9341 *tft;
+    XPT2046_Touchscreen *touch;
+    WPBME280 *bme280;
+
     WPGFX(WPBME280 *bme280);
     void begin();
     void display_right(int X, int Y, String Val);

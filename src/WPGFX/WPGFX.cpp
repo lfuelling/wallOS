@@ -5,6 +5,7 @@ WPGFX::WPGFX(WPBME280 *bme)
     bme280 = bme;
     touch = new XPT2046_Touchscreen(TOUCH_CS, TOUCH_IRQ);
     tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
+    mainPage = new MainPage(tft, touch);
 }
 
 void WPGFX::begin()
@@ -96,6 +97,17 @@ void WPGFX::draw_screen(uint8_t red)
     tft->setFont(&FreeSans9pt7b);
 
     drawStatusBar();
+
+    switch (currentPage)
+    {
+    case 1:
+        //TODO: draw settings
+        break;
+    case 0:
+    default:
+        mainPage->drawMainPage();
+        break;
+    }
 }
 
 // Display the boot screen
