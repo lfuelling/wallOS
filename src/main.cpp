@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include <time.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <WPGFX/WPGFX.h>
 #include <WPMQTT/WPMQTT.h>
 #include <WPBME280/WPBME280.h>
@@ -15,8 +16,8 @@ WPGFX wpgfx = WPGFX(&wpbme);
 TaskHandle_t graphicsTask;
 
 // WPMQTT
-WiFiClient wifiClient;
-WPMQTT wpmqtt = WPMQTT(wifiClient, &wpbme);
+WiFiClientSecure wifiClient;
+WPMQTT wpmqtt = WPMQTT(&wpbme);
 
 // loop method that runs the graphics on the other core
 void graphicsLoop(void *parameter)
@@ -72,7 +73,7 @@ void setup()
 #endif
 
   wpgfx.setBootStatus("Connecting MQTT...");
-  wpmqtt.begin();
+  wpmqtt.begin(wifiClient);
 
   wpgfx.setBootStatus("Startup complete!");
 
