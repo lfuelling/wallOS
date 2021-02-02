@@ -44,7 +44,7 @@ void WPGFX::handleGraphics()
 #ifdef _debug
     if(touch->touched()) {
         TS_Point p = ScreenUtils().getTouchPosition(tft, touch);
-        Serial.print("Drawing touch circle at ");
+        Serial.print("[Touch] Drawing circle at ");
         Serial.print(p.x);
         Serial.print(",");
         Serial.println(p.y);
