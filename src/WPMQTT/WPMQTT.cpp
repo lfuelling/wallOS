@@ -34,7 +34,6 @@ void onMessage(String &topic, String &payload)
 void WPMQTT::begin(WiFiClientSecure wifi)
 {
     client->begin(MQTT_SERVER_IP, MQTT_SERVER_PORT, wifi);
-    client->subscribe(MQTT_COMMAND_TOPIC, 1);
     client->onMessage(onMessage);
 
     while (!client->connect("Wandpanel", MQTT_USERAME, MQTT_PASSWORD, false))
@@ -44,6 +43,24 @@ void WPMQTT::begin(WiFiClientSecure wifi)
 #endif
         delay(800);
     }
+
+#ifdef _debug
+    Serial.println("[MQTT] Connected!");
+#endif
+
+    while (!client->subscribe(MQTT_COMMAND_TOPIC, 1))
+    {
+#ifdef _debug
+        Serial.println("[MQTT] Subscription failed! Retrying...");
+#endif
+        delay(400);
+    }
+
+#ifdef _debug
+    Serial.print("[MQTT] Subscribed to ");
+    Serial.print(MQTT_COMMAND_TOPIC);
+    Serial.println("!");
+#endif
 }
 
 void WPMQTT::publishMessage(String topic, String message)
