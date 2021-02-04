@@ -8,6 +8,8 @@ This is a firmware for the [ESP32 wall panel by AZ-Delivery](https://az-delivery
 - Connects to WiFi
 - Can (must have) an BME280 on the board (not included by default)
 - Can connect to MQTT
+- Pushes the BME280 telemetry to MQTT with a configurable interval
+- Has the ability to trigger and show the state of MQTT switches (these are currently hardcoded 🙈)
 - ... as of now all the rest is TODO
 
 ## Usage
