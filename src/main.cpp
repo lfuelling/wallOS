@@ -1,5 +1,6 @@
 #include "debug.h"
 #include "config.h"
+#include <Esp.h>
 #include <SPI.h>
 #include <time.h>
 #include <WiFi.h>
@@ -76,7 +77,7 @@ void initializeStorage()
   }
 #endif
 
-bool r6 = NVS.setInt("shouldRedraw", 0);
+  bool r6 = NVS.setInt("shouldRedraw", 0);
 #ifdef _debug
   if (!r6)
   {
@@ -91,6 +92,7 @@ void setup()
 #ifdef _debug
   Serial.begin(115200);
 #endif
+  bool bootFailed = false;
 
   // show bootscreen
   wpgfx.begin();
@@ -109,8 +111,8 @@ void setup()
     Serial.print("[WiFi] Connecting to ");
     Serial.print(WIFI_SSID);
     Serial.println("...");
-    delay(800);
 #endif
+    delay(800);
   }
 
   wpgfx.setBootStatus("Syncing NTP...");
@@ -121,7 +123,7 @@ void setup()
   if (!getLocalTime(&timeinfo))
   {
     Serial.println("[NTP] Failed to get time using NTP!");
-    return;
+    bootFailed = true; // without NTP, TLS won't work, we can as well just GOTO FAIL :)
   }
   Serial.print("[NTP] Synced: ");
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
@@ -136,17 +138,29 @@ void setup()
   wpgfx.setBootStatus("Initializing storage...");
   initializeStorage();
 
-  wpgfx.setBootStatus("Startup complete!");
+  if (bootFailed)
+  {
+    wpgfx.setBootStatus("Boot failed!");
+#ifdef _debug
+    Serial.println("BOOT FAILED!");
+#endif
+    delay(3000);
+    ESP.restart();
+  }
+  else
+  {
+    wpgfx.setBootStatus("Startup complete!");
 
-  // start gfx loop
-  xTaskCreatePinnedToCore(
-      graphicsLoop,   /* Function to implement the task */
-      "graphicsTask", /* Name of the task */
-      10000,          /* Stack size in words */
-      NULL,           /* Task input parameter */
-      2,              /* Priority of the task */
-      &graphicsTask,  /* Task handle. */
-      0);             /* Core where the task should run */
+    // start gfx loop
+    xTaskCreatePinnedToCore(
+        graphicsLoop,   /* Function to implement the task */
+        "graphicsTask", /* Name of the task */
+        10000,          /* Stack size in words */
+        NULL,           /* Task input parameter */
+        2,              /* Priority of the task */
+        &graphicsTask,  /* Task handle. */
+        0);             /* Core where the task should run */
+  }
 }
 
 void loop()
