@@ -9,6 +9,7 @@
 #include "Fonts/Electrolize9pt7b.h"
 #include "../config.h"
 #include "../WPBME280/WPBME280.h"
+#include "../WPMQTT/WPMQTT.h"
 #include "Pages/Main/MainPage.h"
 
 #ifndef WPGFX_H

@@ -7,17 +7,18 @@
 #include <WPGFX/WPGFX.h>
 #include <WPMQTT/WPMQTT.h>
 #include <WPBME280/WPBME280.h>
+#include <ArduinoNvs.h>
 
 // bme280
 WPBME280 wpbme = WPBME280();
 
+// WPMQTT
+WPMQTT wpmqtt = WPMQTT(&wpbme);
+unsigned long lastTelemetryReport = 0;
+
 // WPGFX
 WPGFX wpgfx = WPGFX(&wpbme);
 TaskHandle_t graphicsTask;
-
-// WPMQTT
-WiFiClientSecure wifiClient;
-WPMQTT wpmqtt = WPMQTT(&wpbme);
 
 // loop method that runs the graphics on the other core
 void graphicsLoop(void *parameter)
@@ -26,8 +27,62 @@ void graphicsLoop(void *parameter)
   while (true)
   {
     wpgfx.handleGraphics();
-    delay(100);
+    delay(8);
   }
+}
+
+void initializeStorage()
+{
+#ifdef _debug
+  Serial.println("[NVS] Initializing storage...");
+#endif
+  bool r1 = NVS.setString("lastCommand", "none");
+#ifdef _debug
+  if (!r1)
+  {
+    Serial.println("[NVS] write failed! k=lastCommand, v=none");
+  }
+#endif
+
+  bool r2 = NVS.setString("delock/POWER", "unknown");
+#ifdef _debug
+  if (!r2)
+  {
+    Serial.println("[NVS] write failed! k=delock/POWER, v=unknown");
+  }
+#endif
+
+  bool r3 = NVS.setString("delock2/POWER", "unknown");
+#ifdef _debug
+  if (!r3)
+  {
+    Serial.println("[NVS] write failed! k=delock2/POWER, v=unknown");
+  }
+#endif
+
+  bool r4 = NVS.setString("c/delock/POWER", "none");
+#ifdef _debug
+  if (!r4)
+  {
+    Serial.println("[NVS] write failed! k=c/delock/POWER, v=none");
+  }
+#endif
+
+  bool r5 = NVS.setString("c/delock2/POWER", "none");
+#ifdef _debug
+  if (!r5)
+  {
+    Serial.println("[NVS] write failed! k=c/delock2/POWER, v=none");
+  }
+#endif
+
+bool r6 = NVS.setInt("shouldRedraw", 0);
+#ifdef _debug
+  if (!r6)
+  {
+    Serial.println("[NVS] write failed! k=shouldRedraw, v=0");
+  }
+#endif
 }
 
 // Prepare
@@ -73,7 +128,13 @@ void setup()
 #endif
 
   wpgfx.setBootStatus("Connecting MQTT...");
-  wpmqtt.begin(wifiClient);
+  wpmqtt.begin();
+
+  wpgfx.setBootStatus("Opening storage...");
+  NVS.begin();
+
+  wpgfx.setBootStatus("Initializing storage...");
+  initializeStorage();
 
   wpgfx.setBootStatus("Startup complete!");
 
@@ -83,12 +144,23 @@ void setup()
       "graphicsTask", /* Name of the task */
       10000,          /* Stack size in words */
       NULL,           /* Task input parameter */
-      0,              /* Priority of the task */
+      2,              /* Priority of the task */
       &graphicsTask,  /* Task handle. */
       0);             /* Core where the task should run */
 }
 
 void loop()
 {
-  
+  wpmqtt.loop();
+  if (millis() - lastTelemetryReport > MQTT_TELEMETRY_INTERVAL_MS)
+  {
+#ifdef _debug
+    Serial.println("[MQTT] sending telemetry...");
+#endif
+    wpmqtt.publishMessage("tele/wandpanel/temp", String(wpbme.getTemperature()));
+    wpmqtt.publishMessage("tele/wandpanel/hum", String(wpbme.getHumidity()));
+    wpmqtt.publishMessage("tele/wandpanel/press", String(wpbme.getPressure()));
+    wpmqtt.publishMessage("tele/wandpanel/rssi", String(WiFi.RSSI()));
+    lastTelemetryReport = millis();
+  }
 }

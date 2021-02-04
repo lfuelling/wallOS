@@ -18,6 +18,7 @@
 #define MQTT_CONNECT_COOLDOWN 2000
 #define MQTT_COMMAND_TOPIC "esp32/command"
 #define MQTT_COMMAND_OUTPUT_TOPIC "esp32/command/out"
+#define MQTT_TELEMETRY_INTERVAL_MS 5000
 
 /////////////////// PIN CONFIG OPTIONS ///////////////////
 

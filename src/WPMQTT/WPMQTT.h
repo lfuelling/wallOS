@@ -12,14 +12,20 @@ class WPMQTT
 {
     MQTTClient *client;
     WPBME280 *bme280;
+    WiFiClientSecure wifi;
 
     void reconnect();
     void callback(char *topic, byte *message, unsigned int length);
+    void handleCommand(String command);
+    void subscribe(String topic);
+    
+    void handleDelock(String nvsKey, String topic);
 
 public:
     WPMQTT(WPBME280 *bme280);
-    void begin(WiFiClientSecure wifi);
+    void begin();
     void publishMessage(String topic, String message);
+    void loop();
 };
 
 #endif

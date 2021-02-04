@@ -1,5 +1,6 @@
 #include "WPGFX.h"
 #include "ScreenUtils.h"
+#include "ArduinoNvs.h"
 
 WPGFX::WPGFX(WPBME280 *bme)
 {
@@ -42,7 +43,8 @@ void WPGFX::printError(String error)
 void WPGFX::handleGraphics()
 {
 #ifdef _debug
-    if(touch->touched()) {
+    if (touch->touched())
+    {
         TS_Point p = ScreenUtils().getTouchPosition(tft, touch);
         Serial.print("[Touch] Drawing circle at ");
         Serial.print(p.x);
@@ -59,12 +61,25 @@ void WPGFX::redrawIfNecessary()
     bool timeChanged = lastShownTime != getCurrentTime();
     bool signalChanged = lastSignalString != getSignalStrength();
     bool touchStateChanged = touch->touched() != tsdown;
+    bool nvsShouldRedraw = NVS.getInt("shouldRedraw") == 1;
 
-    if(touchStateChanged) {
+    if (touchStateChanged)
+    {
         tsdown = touch->touched();
     }
 
-    if (timeChanged || signalChanged || touchStateChanged)
+    if (nvsShouldRedraw)
+    {
+        bool result = NVS.setInt("shouldRedraw", 0);
+#ifdef _debug
+        if (!result)
+        {
+            Serial.println("[NVS] write failed! k=shouldRedraw, v=0");
+        }
+#endif
+    }
+
+    if (timeChanged || signalChanged || touchStateChanged || nvsShouldRedraw)
     {
         // redraw the screen
         draw_screen(rotation);
@@ -82,6 +97,10 @@ void WPGFX::redrawIfNecessary()
         if (touchStateChanged)
         {
             Serial.print("touch ");
+        }
+        if (nvsShouldRedraw)
+        {
+            Serial.print("nvs ");
         }
         Serial.println();
 #endif

@@ -6,6 +6,8 @@
 #include "../../Fonts/FreeSans9pt7b.h"
 #include "../../Fonts/FreeMono9pt7b.h"
 #include "../../ScreenUtils.h"
+#include "../../../WPMQTT/WPMQTT.h"
+#include <ArduinoNvs.h>
 
 #ifndef WPGFX_MAIN_PAGE_H
 #define WPGFX_MAIN_PAGE_H
@@ -20,7 +22,12 @@ class MainPage
     int currentPage = 0;
 
     void drawSettingsButton(int w, int h);
+    void drawSwitchesButton(int w, int h);
     void drawBackButton(int w, int h);
+    
+    void drawSwitchesPage();
+    void drawFirstDelockSwitch();
+    void drawSecondDelockSwitch();
 
 public:
     MainPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor);
