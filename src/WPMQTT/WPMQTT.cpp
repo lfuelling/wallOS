@@ -141,7 +141,7 @@ void WPMQTT::reconnect()
 
 void WPMQTT::subscribe(String topic)
 {
-    while (!client->subscribe(topic, 1))
+    while (!client->subscribe(topic, MQTT_QOS_LEVEL))
     {
 #ifdef _debug
         Serial.print("[MQTT] Subscription to '");

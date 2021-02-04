@@ -19,6 +19,7 @@
 #define MQTT_COMMAND_TOPIC "esp32/command"
 #define MQTT_COMMAND_OUTPUT_TOPIC "esp32/command/out"
 #define MQTT_TELEMETRY_INTERVAL_MS 5000
+#define MQTT_QOS_LEVEL 2
 
 /////////////////// PIN CONFIG OPTIONS ///////////////////
 
