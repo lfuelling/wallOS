@@ -35,6 +35,7 @@ struct MqttSwitch
 #define MQTT_TELEMETRY_INTERVAL_MS 5000
 #define MQTT_QOS_LEVEL 2
 
+// List of MQTT Switches
 static const MqttSwitch switches[] = {
     {"Switch 1", "cmnd/s1/POWER", "stat/s1/POWER", "ON", "OFF"},
     {"Switch 2", "cmnd/s2/POWER", "stat/s2/POWER", "ON", "OFF"}};
