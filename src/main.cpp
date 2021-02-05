@@ -21,6 +21,9 @@ unsigned long lastTelemetryReport = 0;
 WPGFX wpgfx = WPGFX(&wpbme);
 TaskHandle_t graphicsTask;
 
+// Photoresistor
+int photoresistorVal;
+
 // loop method that runs the graphics on the other core
 void graphicsLoop(void *parameter)
 {
@@ -99,6 +102,10 @@ void setup()
   wpgfx.drawBootScreen();
   delay(100);
 
+  // init photoresistor
+  wpgfx.setBootStatus("Photoresistor...");
+  photoresistorVal = analogRead(PHOTORESISTOR_PIN);
+
   // init bme
   wpgfx.setBootStatus("Loading BME280...");
   wpbme.begin();
@@ -165,7 +172,13 @@ void setup()
 
 void loop()
 {
+  // read light level
+  photoresistorVal = analogRead(PHOTORESISTOR_PIN);
+
+  // handle mqtt messages
   wpmqtt.loop();
+
+  // send mqtt telemetry
   if (millis() - lastTelemetryReport > MQTT_TELEMETRY_INTERVAL_MS)
   {
 #ifdef _debug
@@ -175,6 +188,7 @@ void loop()
     wpmqtt.publishMessage("tele/wandpanel/hum", String(wpbme.getHumidity()));
     wpmqtt.publishMessage("tele/wandpanel/press", String(wpbme.getPressure()));
     wpmqtt.publishMessage("tele/wandpanel/rssi", String(WiFi.RSSI()));
+    wpmqtt.publishMessage("tele/wandpanel/photo", String(photoresistorVal));
     lastTelemetryReport = millis();
   }
 }
