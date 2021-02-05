@@ -1,43 +1,36 @@
 #include "MainPage.h"
 
-void MainPage::drawSwitchesPage()
-{
-    drawFirstDelockSwitch();
-    drawSecondDelockSwitch();
-}
+int currentSwitchId = 0;
 
-void setDelockPowerCommand(String delockKey, String state)
+void setSwitchState(String switchName, String state)
 {
-    String topic = String("c/" + delockKey + "/POWER");
-    bool result = NVS.setString(topic, state);
+    bool result = NVS.setString(switchName, state);
 #ifdef _debug
     if (!result)
     {
         Serial.print("[NVS] write failed! k=");
-        Serial.print(topic);
+        Serial.print(switchName);
         Serial.print(", v=");
         Serial.println(state);
     }
 #endif
 }
 
-void MainPage::drawFirstDelockSwitch()
+void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
 {
-    int w = tft->width();
-    int h = tft->height();
     uint16_t buttonColor;
 
-    int x1 = 8;
-    int y1 = h - 90;
-    int btnWidth = 90;
-    int btnHeight = 82;
+    int x1 = 95;
+    int y1 = 56;
+    int btnWidth = 128;
+    int btnHeight = 128;
     int x2 = x1 + btnWidth;
     int y2 = y1 + btnHeight;
 
-    String currentState = NVS.getString("delock/POWER");
+    String currentState = NVS.getString(String("s/" + currentSwitch.switchName));
     bool buttonPressed = touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2);
 
-    if (currentState == "ON" || buttonPressed)
+    if (currentState == currentSwitch.powerOnValue || buttonPressed)
     {
         buttonColor = 0xC618; // lightgrey
     }
@@ -49,32 +42,32 @@ void MainPage::drawFirstDelockSwitch()
     // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
     tft->setTextColor(ILI9341_WHITE, buttonColor);
-    tft->setCursor(x1 + (btnWidth / 2) - 34, y1 + (btnHeight / 2) + 6);
+    tft->setCursor((x1 + (btnWidth / 2)) - (currentSwitch.switchName.length() * 5), y1 + (btnHeight / 2) + 6);
 
     String buttonText;
     if (currentState == "unknown")
     {
-        buttonText = "Flur ?";
+        buttonText = String(currentSwitch.switchName + " ?");
     }
     else
     {
-        buttonText = "Flur";
+        buttonText = currentSwitch.switchName;
     }
     tft->print(buttonText);
 
     if (buttonPressed)
     {
-        if (currentState == "ON")
+        if (currentState == currentSwitch.powerOnValue)
         {
-            setDelockPowerCommand("delock", "OFF");
+            setSwitchState(currentSwitch.switchName, currentSwitch.powerOffValue);
         }
-        else if (currentState == "OFF")
+        else if (currentState == currentSwitch.powerOffValue)
         {
-            setDelockPowerCommand("delock", "ON");
+            setSwitchState(currentSwitch.switchName, currentSwitch.powerOnValue);
         }
         else
         {
-            setDelockPowerCommand("delock", "ON");
+            setSwitchState(currentSwitch.switchName, currentSwitch.powerOnValue);
 #ifdef _debug
             Serial.println("[Switch] Current state of delock unknown, sending ON!");
 #endif
@@ -82,23 +75,36 @@ void MainPage::drawFirstDelockSwitch()
     }
 }
 
-void MainPage::drawSecondDelockSwitch()
+void MainPage::drawSwitchesPage()
 {
-    int w = tft->width();
-    int h = tft->height();
+    if (currentSwitchId >= (sizeof(switches) / sizeof(switches[0])))
+    {
+#ifdef _debug
+        Serial.println("[Switch] Resettign currentSwitchId to 0!");
+#endif
+        currentSwitchId = 0;
+    }
+
+    MqttSwitch currentSwitch = switches[currentSwitchId];
+    drawPreviousSwitchButton();
+    drawSwitchButton(currentSwitch);
+    drawNextSwitchButton();
+}
+
+void MainPage::drawPreviousSwitchButton()
+{
     uint16_t buttonColor;
 
-    int x1 = 8;
-    int y1 = h - 180; // 8px above first button
-    int btnWidth = 90;
-    int btnHeight = 82;
+    int btnWidth = 32;
+    int btnHeight = 32;
+    int x1 = 10;
+    int y1 = (tft->height() / 2) - (btnHeight / 2);
     int x2 = x1 + btnWidth;
     int y2 = y1 + btnHeight;
 
-    String currentState = NVS.getString("delock2/POWER");
     bool buttonPressed = touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2);
 
-    if (currentState == "ON" || buttonPressed)
+    if (buttonPressed)
     {
         buttonColor = 0xC618; // lightgrey
     }
@@ -107,38 +113,52 @@ void MainPage::drawSecondDelockSwitch()
         buttonColor = 0x2104; // very dark grey
     }
 
-    // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
     tft->setTextColor(ILI9341_WHITE, buttonColor);
-    tft->setCursor(x1 + (btnWidth / 2) - 34, y1 + (btnHeight / 2) + 6);
-
-    String buttonText;
-    if (currentState == "unknown")
-    {
-        buttonText = "Wohn ?";
-    }
-    else
-    {
-        buttonText = "Wohn";
-    }
-    tft->print(buttonText);
+    tft->setCursor(x1 + (btnWidth / 2) - 8, y1 + (btnHeight / 2) + 6);
+    tft->print("<");
 
     if (buttonPressed)
     {
-        if (currentState == "ON")
-        {
-            setDelockPowerCommand("delock2", "OFF");
-        }
-        else if (currentState == "OFF")
-        {
-            setDelockPowerCommand("delock2", "ON");
-        }
-        else
-        {
-            setDelockPowerCommand("delock2", "ON");
+        currentSwitchId--;
 #ifdef _debug
-            Serial.println("[Switch] Current state of delock2 unknown, sending ON!");
+        Serial.println("[Switch] Navigating to previous switch!");
 #endif
-        }
+    }
+}
+
+void MainPage::drawNextSwitchButton()
+{
+    uint16_t buttonColor;
+
+    int btnWidth = 32;
+    int btnHeight = 32;
+    int x1 = (tft->width() - (btnWidth + 8));
+    int y1 = (tft->height() / 2) - (btnHeight / 2);
+    int x2 = x1 + btnWidth;
+    int y2 = y1 + btnHeight;
+
+    bool buttonPressed = touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2);
+
+    if (buttonPressed)
+    {
+        buttonColor = 0xC618; // lightgrey
+    }
+    else
+    {
+        buttonColor = 0x2104; // very dark grey
+    }
+
+    tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
+    tft->setTextColor(ILI9341_WHITE, buttonColor);
+    tft->setCursor(x1 + (btnWidth / 2) - 8, y1 + (btnHeight / 2) + 6);
+    tft->print(">");
+
+    if (buttonPressed)
+    {
+        currentSwitchId++;
+#ifdef _debug
+        Serial.println("[Switch] Navigating to next switch!");
+#endif
     }
 }

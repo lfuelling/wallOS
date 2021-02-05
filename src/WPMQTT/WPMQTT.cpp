@@ -45,15 +45,14 @@ void onMessage(String &topic, String &payload)
 #endif
     }
 
-    if (topic == "stat/delock/POWER")
+    for (int i = 0; i < (sizeof(switches) / sizeof(switches[0])); i++)
     {
-        NVS.setString("delock/POWER", payload);
-        requestRedraw();
-    }
-    else if (topic == "stat/delock2/POWER")
-    {
-        NVS.setString("delock2/POWER", payload);
-        requestRedraw();
+        MqttSwitch s = switches[i];
+        if (topic == s.statusTopic)
+        {
+            NVS.setString(String("s/" + s.switchName), payload);
+            requestRedraw();
+        }
     }
 }
 
@@ -97,17 +96,20 @@ void WPMQTT::loop()
         handleCommand(command);
     }
 
-    handleDelock("c/delock/POWER", "cmnd/delock/POWER");
-    handleDelock("c/delock2/POWER", "cmnd/delock2/POWER");
+    for (int i = 0; i < (sizeof(switches) / sizeof(switches[0])); i++)
+    {
+        MqttSwitch s = switches[i];
+        handleSwitch(s.switchName, s.commandTopic);
+    }
 }
 
-void WPMQTT::handleDelock(String nvsKey, String topic)
+void WPMQTT::handleSwitch(String nvsKey, String topic)
 {
     String delockCommand = NVS.getString(nvsKey);
     if (delockCommand != "none")
     {
 #ifdef _debug
-        Serial.print("[MQTT] delock command: k=");
+        Serial.print("[MQTT] switch command: k=");
         Serial.print(topic);
         Serial.print(", v=");
         Serial.println(delockCommand);
@@ -134,8 +136,12 @@ void WPMQTT::reconnect()
 #endif
 
         subscribe(MQTT_COMMAND_TOPIC);
-        subscribe("stat/delock/POWER");
-        subscribe("stat/delock2/POWER");
+
+        for (int i = 0; i < (sizeof(switches) / sizeof(switches[0])); i++)
+        {
+            MqttSwitch s = switches[i];
+            subscribe(s.statusTopic);
+        }
     }
 }
 

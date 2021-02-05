@@ -19,7 +19,7 @@ class WPMQTT
     void handleCommand(String command);
     void subscribe(String topic);
     
-    void handleDelock(String nvsKey, String topic);
+    void handleSwitch(String nvsKey, String topic);
 
 public:
     WPMQTT(WPBME280 *bme280);

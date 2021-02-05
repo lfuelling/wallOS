@@ -26,8 +26,9 @@ class MainPage
     void drawBackButton(int w, int h);
     
     void drawSwitchesPage();
-    void drawFirstDelockSwitch();
-    void drawSecondDelockSwitch();
+    void drawSwitchButton(MqttSwitch currentSwitch);
+    void drawNextSwitchButton();
+    void drawPreviousSwitchButton();
 
 public:
     MainPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor);

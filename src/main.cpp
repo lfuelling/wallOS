@@ -48,21 +48,26 @@ void initializeStorage()
   }
 #endif
 
-  bool r2 = NVS.setString("delock/POWER", "unknown");
-#ifdef _debug
-  if (!r2)
+  for (int i = 0; i < (sizeof(switches) / sizeof(switches[0])); i++)
   {
-    Serial.println("[NVS] write failed! k=delock/POWER, v=unknown");
-  }
-#endif
-
-  bool r3 = NVS.setString("delock2/POWER", "unknown");
+    MqttSwitch s = switches[i];
+    bool rs1 = NVS.setString(String("s/" + s.switchName), "unknown");
+    bool rs2 = NVS.setString(s.switchName, "unknown");
 #ifdef _debug
-  if (!r3)
-  {
-    Serial.println("[NVS] write failed! k=delock2/POWER, v=unknown");
-  }
+    if (!rs1)
+    {
+      Serial.print("[NVS] write failed! k=");
+      Serial.print("s/" + s.switchName);
+      Serial.println(", v=unknown");
+    }
+    if (!rs2)
+    {
+      Serial.print("[NVS] write failed! k=");
+      Serial.print(s.switchName);
+      Serial.println(", v=unknown");
+    }
 #endif
+  }
 
   bool r4 = NVS.setString("c/delock/POWER", "none");
 #ifdef _debug
@@ -100,6 +105,19 @@ void setup()
   wpgfx.begin();
   wpgfx.drawBootScreen();
   delay(100);
+
+  // init storage
+  wpgfx.setBootStatus("Opening storage...");
+  if (!NVS.begin())
+  {
+#ifdef _debug
+    Serial.println("Error while initializing NVS!");
+#endif
+    wpgfx.showFatalError("Error accessing storage!", true);
+  }
+
+  wpgfx.setBootStatus("Initializing storage...");
+  initializeStorage();
 
   // init photoresistor
   wpgfx.setBootStatus("Photoresistor...");
@@ -139,18 +157,6 @@ void setup()
 
   wpgfx.setBootStatus("Connecting MQTT...");
   wpmqtt.begin();
-
-  wpgfx.setBootStatus("Opening storage...");
-  if (!NVS.begin())
-  {
-#ifdef _debug
-    Serial.println("Error while initializing NVS!");
-#endif
-    wpgfx.showFatalError("Error accessing storage!", true);
-  }
-
-  wpgfx.setBootStatus("Initializing storage...");
-  initializeStorage();
 
   wpgfx.setBootStatus("Startup complete!");
 

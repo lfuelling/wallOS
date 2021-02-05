@@ -1,6 +1,15 @@
 #ifndef WP_CONFIG_H
 #define WP_CONFIG_H
 
+struct MqttSwitch
+{
+    String switchName;
+    String commandTopic;
+    String statusTopic;
+    String powerOnValue;
+    String powerOffValue;
+};
+
 /////////////////// MAIN CONFIG OPTIONS ///////////////////
 
 // Time settings
@@ -25,6 +34,10 @@
 #define MQTT_COMMAND_OUTPUT_TOPIC "esp32/command/out"
 #define MQTT_TELEMETRY_INTERVAL_MS 5000
 #define MQTT_QOS_LEVEL 2
+
+static const MqttSwitch switches[] = {
+    {"Switch 1", "cmnd/s1/POWER", "stat/s1/POWER", "ON", "OFF"},
+    {"Switch 2", "cmnd/s2/POWER", "stat/s2/POWER", "ON", "OFF"}};
 
 /////////////////// PIN CONFIG OPTIONS ///////////////////
 
