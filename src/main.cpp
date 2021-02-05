@@ -95,7 +95,6 @@ void setup()
 #ifdef _debug
   Serial.begin(115200);
 #endif
-  bool bootFailed = false;
 
   // show bootscreen
   wpgfx.begin();
@@ -125,13 +124,15 @@ void setup()
   wpgfx.setBootStatus("Syncing NTP...");
   configTime(NTP_UTC_OFFSET_SECONDS, NTP_DAYLIGHT_OFFSET_SECONDS, NTP_SERVER_HOSTNAME);
 
-#ifdef _debug
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo))
   {
+#ifdef _debug
     Serial.println("[NTP] Failed to get time using NTP!");
-    bootFailed = true; // without NTP, TLS won't work, we can as well just GOTO FAIL :)
+#endif
+    wpgfx.showFatalError("Error syncing NTP!", true); // without NTP, TLS won't work, we can as well just GOTO FAIL :)
   }
+#ifdef _debug
   Serial.print("[NTP] Synced: ");
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
 #endif
@@ -140,34 +141,28 @@ void setup()
   wpmqtt.begin();
 
   wpgfx.setBootStatus("Opening storage...");
-  NVS.begin();
+  if (!NVS.begin())
+  {
+#ifdef _debug
+    Serial.println("Error while initializing NVS!");
+#endif
+    wpgfx.showFatalError("Error accessing storage!", true);
+  }
 
   wpgfx.setBootStatus("Initializing storage...");
   initializeStorage();
 
-  if (bootFailed)
-  {
-    wpgfx.setBootStatus("Boot failed!");
-#ifdef _debug
-    Serial.println("BOOT FAILED!");
-#endif
-    delay(3000);
-    ESP.restart();
-  }
-  else
-  {
-    wpgfx.setBootStatus("Startup complete!");
+  wpgfx.setBootStatus("Startup complete!");
 
-    // start gfx loop
-    xTaskCreatePinnedToCore(
-        graphicsLoop,   /* Function to implement the task */
-        "graphicsTask", /* Name of the task */
-        10000,          /* Stack size in words */
-        NULL,           /* Task input parameter */
-        2,              /* Priority of the task */
-        &graphicsTask,  /* Task handle. */
-        0);             /* Core where the task should run */
-  }
+  // start gfx loop
+  xTaskCreatePinnedToCore(
+      graphicsLoop,   /* Function to implement the task */
+      "graphicsTask", /* Name of the task */
+      10000,          /* Stack size in words */
+      NULL,           /* Task input parameter */
+      2,              /* Priority of the task */
+      &graphicsTask,  /* Task handle. */
+      0);             /* Core where the task should run */
 }
 
 void loop()

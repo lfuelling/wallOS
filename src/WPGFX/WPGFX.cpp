@@ -33,9 +33,32 @@ void WPGFX::begin()
     rotation = 1;
 }
 
-void WPGFX::printError(String error)
+void WPGFX::showFatalError(String error, bool reboot)
 {
-    //TODO: implement
+    uint16_t W, h;
+    // Select the colors and font orientation
+    tft->setRotation(1);
+    tft->fillScreen(ILI9341_BLACK);
+    tft->setTextColor(ILI9341_LIGHTGREY, ILI9341_BLACK);
+    tft->setFont(&FreeMono9pt7b);
+    W = tft->width();
+    h = tft->height();
+
+    tft->setCursor(W / 2 - 64, h / 2 + 9);
+    tft->println("-         -");
+    tft->setCursor(W / 2 - 64, h / 2 + 18);
+    tft->println(" \\_x.x)_/ ");
+
+    tft->setFont(&gidugu10pt7b);
+    tft->setCursor(W / 2 - 56, h / 2 + 40);
+    tft->println(error);
+    tft->setFont(&FreeMono9pt7b);
+
+    if (reboot)
+    {
+        delay(3000);
+        ESP.restart();
+    }
 }
 
 // current position and contact state

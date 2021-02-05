@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <Esp.h>
 #include <debug.h>
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
@@ -58,7 +59,7 @@ public:
     void draw_screen(uint8_t red);
     void drawBootScreen();
     void handleGraphics();
-    void printError(String error);
+    void showFatalError(String error, bool reboot);
     void setBootStatus(String status);
 };
 
