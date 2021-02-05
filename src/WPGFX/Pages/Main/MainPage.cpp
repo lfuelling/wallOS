@@ -42,6 +42,7 @@ void MainPage::drawMainPage()
 void MainPage::drawBackButton(int w, int h)
 {
     uint16_t buttonColor;
+    uint16_t fontColor;
 
     int x1 = w - 38;
     int y1 = h - 38;
@@ -54,15 +55,17 @@ void MainPage::drawBackButton(int w, int h)
     {
         buttonColor = 0xC618; // lightgrey
         currentPage = 0;      // set current page to main
+        fontColor = 0x0000;
     }
     else
     {
         buttonColor = 0x2104; // very dark grey
+        fontColor = 0xFFFF;
     }
 
     // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(ILI9341_WHITE, buttonColor);
+    tft->setTextColor(fontColor, buttonColor);
     tft->setCursor(x1 + (btnWidth / 2) - 8, y1 + (btnHeight / 2) + 4);
     tft->print("<-");
 }
@@ -70,6 +73,7 @@ void MainPage::drawBackButton(int w, int h)
 void MainPage::drawSettingsButton(int w, int h)
 {
     uint16_t buttonColor;
+    uint16_t fontColor;
 
     int x1 = 8;
     int y1 = h - 90;
@@ -82,15 +86,17 @@ void MainPage::drawSettingsButton(int w, int h)
     {
         buttonColor = 0xC618; // lightgrey
         currentPage = 1;      // set current page to settings
+        fontColor = 0x0000;
     }
     else
     {
         buttonColor = 0x2104; // very dark grey
+        fontColor = 0xFFFF;
     }
 
     // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(ILI9341_WHITE, buttonColor);
+    tft->setTextColor(fontColor, buttonColor);
     tft->setCursor(x1 + (btnWidth / 2) - 34, y1 + (btnHeight / 2) + 6);
     tft->print("Settings");
 }
@@ -98,6 +104,7 @@ void MainPage::drawSettingsButton(int w, int h)
 void MainPage::drawSwitchesButton(int w, int h)
 {
     uint16_t buttonColor;
+    uint16_t fontColor;
 
     int x1 = 8;
     int y1 = h - 180; // 8px above settings button
@@ -110,15 +117,17 @@ void MainPage::drawSwitchesButton(int w, int h)
     {
         buttonColor = 0xC618; // lightgrey
         currentPage = 2;      // set current page to switches
+        fontColor = 0x0000;
     }
     else
     {
         buttonColor = 0x2104; // very dark grey
+        fontColor = 0xFFFF;
     }
 
     // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(ILI9341_WHITE, buttonColor);
+    tft->setTextColor(fontColor, buttonColor);
     tft->setCursor(x1 + (btnWidth / 2) - 37, y1 + (btnHeight / 2) + 6);
     tft->print("Switches");
 }

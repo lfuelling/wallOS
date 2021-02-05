@@ -19,6 +19,7 @@ void setSwitchState(String switchName, String state)
 void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
 {
     uint16_t buttonColor;
+    uint16_t fontColor;
 
     int x1 = 95;
     int y1 = 56;
@@ -33,15 +34,17 @@ void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
     if (currentState == currentSwitch.powerOnValue || buttonPressed)
     {
         buttonColor = 0xC618; // lightgrey
+        fontColor = 0x0000;
     }
     else
     {
         buttonColor = 0x2104; // very dark grey
+        fontColor = 0xFFFF;
     }
 
     // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(ILI9341_WHITE, buttonColor);
+    tft->setTextColor(fontColor, buttonColor);
     tft->setCursor((x1 + (btnWidth / 2)) - (currentSwitch.switchName.length() * 5), y1 + (btnHeight / 2) + 6);
 
     String buttonText;
@@ -80,7 +83,7 @@ void MainPage::drawSwitchesPage()
     if (currentSwitchId >= (sizeof(switches) / sizeof(switches[0])))
     {
 #ifdef _debug
-        Serial.println("[Switch] Resettign currentSwitchId to 0!");
+        Serial.println("[Switch] Resetting currentSwitchId to 0!");
 #endif
         currentSwitchId = 0;
     }
@@ -94,6 +97,7 @@ void MainPage::drawSwitchesPage()
 void MainPage::drawPreviousSwitchButton()
 {
     uint16_t buttonColor;
+    uint16_t fontColor;
 
     int btnWidth = 32;
     int btnHeight = 32;
@@ -107,20 +111,29 @@ void MainPage::drawPreviousSwitchButton()
     if (buttonPressed)
     {
         buttonColor = 0xC618; // lightgrey
+        fontColor = 0x0000;
     }
     else
     {
         buttonColor = 0x2104; // very dark grey
+        fontColor = 0xFFFF;
     }
 
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(ILI9341_WHITE, buttonColor);
+    tft->setTextColor(fontColor, buttonColor);
     tft->setCursor(x1 + (btnWidth / 2) - 8, y1 + (btnHeight / 2) + 6);
     tft->print("<");
 
     if (buttonPressed)
     {
-        currentSwitchId--;
+        if (currentSwitchId == 0)
+        {
+            currentSwitchId = (sizeof(switches) / sizeof(switches[0])) - 1;
+        }
+        else
+        {
+            currentSwitchId--;
+        }
 #ifdef _debug
         Serial.println("[Switch] Navigating to previous switch!");
 #endif
@@ -130,6 +143,7 @@ void MainPage::drawPreviousSwitchButton()
 void MainPage::drawNextSwitchButton()
 {
     uint16_t buttonColor;
+    uint16_t fontColor;
 
     int btnWidth = 32;
     int btnHeight = 32;
@@ -143,14 +157,16 @@ void MainPage::drawNextSwitchButton()
     if (buttonPressed)
     {
         buttonColor = 0xC618; // lightgrey
+        fontColor = 0x0000;
     }
     else
     {
         buttonColor = 0x2104; // very dark grey
+        fontColor = 0xFFFF;
     }
 
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(ILI9341_WHITE, buttonColor);
+    tft->setTextColor(fontColor, buttonColor);
     tft->setCursor(x1 + (btnWidth / 2) - 8, y1 + (btnHeight / 2) + 6);
     tft->print(">");
 
