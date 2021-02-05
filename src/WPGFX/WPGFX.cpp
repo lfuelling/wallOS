@@ -45,9 +45,9 @@ void WPGFX::showFatalError(String error, bool reboot)
     h = tft->height();
 
     tft->setCursor(W / 2 - 64, h / 2 + 9);
-    tft->println("-        -");
+    tft->println("-         -");
     tft->setCursor(W / 2 - 64, h / 2 + 18);
-    tft->println(" \\_x.x)_/ ");
+    tft->println(" \\(_x.x)_/ ");
 
     tft->setFont(&gidugu10pt7b);
     tft->setCursor(W / 2 - 56, h / 2 + 40);
