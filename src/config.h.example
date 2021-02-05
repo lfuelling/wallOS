@@ -3,6 +3,11 @@
 
 /////////////////// MAIN CONFIG OPTIONS ///////////////////
 
+// Time settings
+#define NTP_UTC_OFFSET_SECONDS 3600 // UTC+1
+#define NTP_DAYLIGHT_OFFSET_SECONDS 3600 // 3600 for DST, 0 otherwise
+#define NTP_SERVER_HOSTNAME "pool.ntp.org"
+
 // BME280 Settings
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -39,6 +44,9 @@
 // BME280 pins
 #define BME280_SDA 26
 #define BME280_SCL 25
+
+// Photoresistor Pin
+#define PHOTORESISTOR_PIN 34
 
 /////////////////// MISC CONFIG OPTIONS ///////////////////
 
