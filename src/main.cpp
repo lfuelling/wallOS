@@ -181,7 +181,7 @@ void setup()
 #ifdef _debug
     Serial.println("[NTP] Failed to get time using NTP!");
 #endif
-    wpgfx.showFatalError("Error syncing NTP!", true); // without NTP, TLS won't work, we can as well just GOTO FAIL :)
+    wpgfx.showFatalError("Error syncing NTP!", true); // TLS won't work without NTP, we can as well just GOTO FAIL :)
   }
 #ifdef _debug
   Serial.print("[NTP] Synced: ");

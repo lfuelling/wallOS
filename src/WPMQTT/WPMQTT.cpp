@@ -1,5 +1,6 @@
 #include "WPMQTT/WPMQTT.h"
 #include "ArduinoNvs.h"
+#include <Esp.h>
 
 WPMQTT::WPMQTT(WPBME280 *bme)
 {
@@ -168,6 +169,8 @@ void WPMQTT::handleCommand(String command)
     if (command == "version")
     {
         client->publish(MQTT_COMMAND_OUTPUT_TOPIC, WP_VERSION);
+    } else if (command == "reboot") {
+        ESP.restart();
     }
     bool result = NVS.setString("lastCommand", "none");
 #ifdef _debug
