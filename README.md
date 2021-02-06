@@ -1,6 +1,6 @@
 # ESP32 Wall Panel Operating System (wallOS)
 
-This is a firmware for the [ESP32 wall panel by AZ-Delivery](https://az-delivery.de/products/az-touch-wandgehauseset-mit-2-8-zoll-touchscreen-fur-esp8266-und-esp32) (ESP32 only, although the board can also use an 8266).
+This is a firmware for the [ESP32 wall panel by AZ-Delivery](https://az-delivery.de/products/az-touch-wandgehauseset-mit-2-8-zoll-touchscreen-fur-esp8266-und-esp32) (ESP32 only, although the board can also run with an 8266).
 
 ## Features
 
