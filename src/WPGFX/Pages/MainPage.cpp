@@ -1,4 +1,4 @@
-#include "MainPage.h"
+#include "WPGFX/Pages/MainPage.h"
 
 MainPage::MainPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor)
 {

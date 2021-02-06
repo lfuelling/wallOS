@@ -1,4 +1,4 @@
-#include "MainPage.h"
+#include "WPGFX/Pages/MainPage.h"
 
 int currentSwitchId = 0;
 bool holdingSwitch = false;
@@ -110,7 +110,9 @@ void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
             Serial.println("[Switch] Current state of delock unknown, sending ON!");
 #endif
         }
-    } else if(!buttonPressed && holdingSwitch) {
+    }
+    else if (!buttonPressed && holdingSwitch)
+    {
         holdingSwitch = false;
     }
 }

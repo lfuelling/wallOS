@@ -46,6 +46,6 @@ What you will need:
 
 1. Install PlatformIO
 2. Clone this repo
-3. Rename `src/config.h.example` to `src/config.h`
-4. Edit `src/config.h` to fit your needs
+3. Copy `include/config.h.example` to `include/config.h`
+4. Edit `include/config.h` to fit your needs
 5. Compile and flash the code

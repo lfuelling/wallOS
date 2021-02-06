@@ -18,7 +18,7 @@ class WPMQTT
     void callback(char *topic, byte *message, unsigned int length);
     void handleCommand(String command);
     void subscribe(String topic);
-    
+
     void handleSwitch(String nvsKey, String topic);
 
 public:

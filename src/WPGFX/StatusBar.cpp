@@ -1,4 +1,4 @@
-#include "WPGFX.h"
+#include "WPGFX/WPGFX.h"
 
 void WPGFX::drawStatusBar()
 {

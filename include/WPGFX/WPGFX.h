@@ -11,7 +11,7 @@
 #include "../config.h"
 #include "../WPBME280/WPBME280.h"
 #include "../WPMQTT/WPMQTT.h"
-#include "Pages/Main/MainPage.h"
+#include "Pages/MainPage.h"
 
 #ifndef WPGFX_H
 #define WPGFX_H

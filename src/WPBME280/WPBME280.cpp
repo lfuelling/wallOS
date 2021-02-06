@@ -1,4 +1,4 @@
-#include "WPBME280.h"
+#include "WPBME280/WPBME280.h"
 
 WPBME280::WPBME280()
 {
@@ -22,7 +22,8 @@ void WPBME280::begin()
     started = true;
 }
 
-bool WPBME280::isStarted() {
+bool WPBME280::isStarted()
+{
     return started == true;
 }
 

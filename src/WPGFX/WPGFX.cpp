@@ -1,5 +1,5 @@
-#include "WPGFX.h"
-#include "ScreenUtils.h"
+#include "WPGFX/WPGFX.h"
+#include "WPGFX/ScreenUtils.h"
 #include "ArduinoNvs.h"
 
 WPGFX::WPGFX(WPBME280 *bme)
