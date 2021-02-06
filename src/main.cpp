@@ -94,6 +94,36 @@ void initializeStorage()
 #endif
 }
 
+void publishTelemetry() {
+  #ifdef _debug
+    Serial.println("[MQTT] sending telemetry...");
+#endif
+    // sensor values
+    wpmqtt.publishMessage("tele/wandpanel/temp", String(wpbme.getTemperature()));
+    wpmqtt.publishMessage("tele/wandpanel/hum", String(wpbme.getHumidity()));
+    wpmqtt.publishMessage("tele/wandpanel/press", String(wpbme.getPressure()));
+    wpmqtt.publishMessage("tele/wandpanel/rssi", String(WiFi.RSSI()));
+    wpmqtt.publishMessage("tele/wandpanel/photo", String(photoresistorVal));
+
+    // ESP internal values
+    wpmqtt.publishMessage("tele/wandpanel/heap/free", String(ESP.getFreeHeap()));
+    wpmqtt.publishMessage("tele/wandpanel/heap/total", String(ESP.getHeapSize()));
+    wpmqtt.publishMessage("tele/wandpanel/heap/min-free", String(ESP.getMinFreeHeap()));
+    wpmqtt.publishMessage("tele/wandpanel/heap/max-alloc", String(ESP.getMaxAllocHeap()));
+    wpmqtt.publishMessage("tele/wandpanel/psram/free", String(ESP.getFreePsram()));
+    wpmqtt.publishMessage("tele/wandpanel/psram/total", String(ESP.getPsramSize()));
+    wpmqtt.publishMessage("tele/wandpanel/psram/min-free", String(ESP.getMinFreePsram()));
+    wpmqtt.publishMessage("tele/wandpanel/psram/max-alloc", String(ESP.getMaxAllocPsram()));
+    wpmqtt.publishMessage("tele/wandpanel/chip-revision", String(ESP.getChipRevision()));
+    wpmqtt.publishMessage("tele/wandpanel/cpu-freq", String(ESP.getCpuFreqMHz()));
+    wpmqtt.publishMessage("tele/wandpanel/flash/size", String(ESP.getFlashChipSize()));
+    wpmqtt.publishMessage("tele/wandpanel/flash/speed", String(ESP.getFlashChipSpeed()));
+    wpmqtt.publishMessage("tele/wandpanel/sketch/size", String(ESP.getSketchSize()));
+    wpmqtt.publishMessage("tele/wandpanel/sketch/free", String(ESP.getFreeSketchSpace()));
+    wpmqtt.publishMessage("tele/wandpanel/sketch/md5", String(ESP.getSketchMD5()));
+    lastTelemetryReport = millis();
+}
+
 // Prepare
 void setup()
 {
@@ -182,14 +212,6 @@ void loop()
   // send mqtt telemetry
   if (millis() - lastTelemetryReport > MQTT_TELEMETRY_INTERVAL_MS)
   {
-#ifdef _debug
-    Serial.println("[MQTT] sending telemetry...");
-#endif
-    wpmqtt.publishMessage("tele/wandpanel/temp", String(wpbme.getTemperature()));
-    wpmqtt.publishMessage("tele/wandpanel/hum", String(wpbme.getHumidity()));
-    wpmqtt.publishMessage("tele/wandpanel/press", String(wpbme.getPressure()));
-    wpmqtt.publishMessage("tele/wandpanel/rssi", String(WiFi.RSSI()));
-    wpmqtt.publishMessage("tele/wandpanel/photo", String(photoresistorVal));
-    lastTelemetryReport = millis();
+    publishTelemetry();
   }
 }
