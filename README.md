@@ -16,7 +16,7 @@ This is a firmware for the [ESP32 wall panel by AZ-Delivery](https://az-delivery
 ## Usage
 
 What you will need:
-- ESP32
+- ESP32 DevKit C
 - Wall panel (see link above)
 - BMP280 breakout board (i2c version) 
 - A photoresistor (I just had one lying around)
