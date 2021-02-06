@@ -1,5 +1,5 @@
 #include "debug.h"
-#include "config.h"
+#include <config.h>
 #include <Esp.h>
 #include <SPI.h>
 #include <time.h>
@@ -9,6 +9,7 @@
 #include <WPMQTT/WPMQTT.h>
 #include <WPBME280/WPBME280.h>
 #include <ArduinoNvs.h>
+#include <WebServer.h>
 
 // bme280
 WPBME280 wpbme = WPBME280();
@@ -125,28 +126,8 @@ void publishTelemetry()
   lastTelemetryReport = millis();
 }
 
-// Prepare
-void setup()
+void continueBoot()
 {
-#ifdef _debug
-  Serial.begin(115200);
-#endif
-
-  // show bootscreen
-  wpgfx.begin();
-  wpgfx.drawBootScreen();
-  delay(100);
-
-  // init storage
-  wpgfx.setBootStatus("Opening storage...");
-  if (!NVS.begin())
-  {
-#ifdef _debug
-    Serial.println("Error while initializing NVS!");
-#endif
-    wpgfx.showFatalError("Error accessing storage!", true);
-  }
-
   wpgfx.setBootStatus("Initializing storage...");
   initializeStorage();
 
@@ -202,6 +183,108 @@ void setup()
       2,              /* Priority of the task */
       &graphicsTask,  /* Task handle. */
       0);             /* Core where the task should run */
+}
+
+String getRandomString(int length)
+{
+  char randomString[length];
+  // Generate random key
+  memset(randomString, '\0', sizeof(randomString));
+  uint8_t cnt = 0;
+  while (cnt != sizeof(randomString) - 1)
+  {
+    randomString[cnt] = random(0, 0x7F);
+    if (randomString[cnt] == 0)
+    {
+      break;
+    }
+    if (isAlphaNumeric(randomString[cnt]) == true)
+    {
+      cnt++;
+    }
+    else
+    {
+      randomString[cnt] = '\0';
+    }
+  }
+  return String(randomString);
+}
+
+void runInitialSetup()
+{
+  wpgfx.setBootStatus("Starting AP...");
+  String ssid = "WP-1234";
+  String password = getRandomString(10);
+  WiFi.softAP(ssid.c_str(), password.c_str());
+  bool setupDone = false;
+  WebServer server(80);
+  String header;
+
+  server.on("/", [&]() {
+    String html = String("<!DOCTYPE html><html>\n<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>html,body { font-family: sans-serif; color: #fff; background-color: #000;}\n</style></head>\n<body><h1>Initial Setup</h1>\n<form action=\"/save\" method=\"post\">\n<input type=\"text\" name=\"ssid\" id=\"ssid\" placeholder=\"WiFi SSID\"/>\n<input type=\"password\" name=\"password\" id=\"password\" placeholder=\"WiFi Password\"/>\n<button type=\"submit\">Finish Setup</button>\n</form>\n</body></html>");
+    server.send(200, "text/html", html);
+  });
+
+  server.on("/save", HTTP_POST, [&]() {
+    String postBody = server.arg("plain");
+
+    Serial.println();
+    Serial.println(postBody);
+    Serial.println();
+
+    String html = String("<!DOCTYPE html><html>\n<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>html,body { font-family: sans-serif; color: #fff; background-color: #000;}\n</style></head>\n<body><h1>Initial Setup</h1>\n<form>\n<input type=\"text\" name=\"ssid\" id=\"ssid\" placeholder=\"WiFi SSID\"/>\n<input type=\"password\" name=\"password\" id=\"password\" placeholder=\"WiFi Password\"/>\n<button type=\"submit\">Finish Setup</button>\n</form>\n</body></html>");
+    server.send(200, "text/html", html);
+  });
+
+  server.onNotFound([&]() {
+    String html = String("<!DOCTYPE html><html>\n<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>html,body { font-family: sans-serif; color: #fff; background-color: #000;}\n</style></head>\n<body><h1>Initial Setup</h1>\n<p>Nothing found!</p>\n</body></html>");
+    server.send(404, "text/html", html);
+  });
+
+  server.begin();
+
+  String connectionString = String(ssid + ":" + password);
+#ifdef _debug
+  Serial.println(connectionString);
+#endif
+  wpgfx.setAttentionStatus(connectionString);
+
+  while (!setupDone)
+  {
+    server.handleClient();
+  }
+}
+
+// Prepare
+void setup()
+{
+#ifdef _debug
+  Serial.begin(115200);
+#endif
+
+  // show bootscreen
+  wpgfx.begin();
+  wpgfx.drawBootScreen();
+  delay(100);
+
+  // init storage
+  wpgfx.setBootStatus("Opening storage...");
+  if (!NVS.begin())
+  {
+#ifdef _debug
+    Serial.println("Error while initializing NVS!");
+#endif
+    wpgfx.showFatalError("Error accessing storage!", true);
+  }
+
+  if (NVS.getInt("setupDone") != 100)
+  {
+    runInitialSetup();
+  }
+  else
+  {
+    continueBoot();
+  }
 }
 
 void loop()
