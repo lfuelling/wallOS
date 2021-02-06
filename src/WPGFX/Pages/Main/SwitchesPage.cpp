@@ -1,6 +1,7 @@
 #include "MainPage.h"
 
 int currentSwitchId = 0;
+bool holdingSwitch = false;
 
 void setSwitchState(String switchName, String state)
 {
@@ -91,8 +92,9 @@ void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
     }
     tft->print(buttonText);
 
-    if (buttonPressed)
+    if (buttonPressed && !holdingSwitch)
     {
+        holdingSwitch = true;
         if (currentState == currentSwitch.powerOnValue)
         {
             setSwitchState(currentSwitch.switchName, currentSwitch.powerOffValue);
@@ -108,5 +110,7 @@ void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
             Serial.println("[Switch] Current state of delock unknown, sending ON!");
 #endif
         }
+    } else if(!buttonPressed && holdingSwitch) {
+        holdingSwitch = false;
     }
 }
