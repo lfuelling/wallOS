@@ -24,8 +24,8 @@ void MainPage::drawMainPage()
     default:
         // draw main menu
         tft->setFont(&FreeSans9pt7b);
-        drawSettingsButton(w, h);
-        drawSwitchesButton(w, h);
+        drawButton(8, h - 90, 90, 82, "Settings", [&]() -> void { currentPage = 1; });
+        drawButton(8, h - 180, 90, 82, "Switches", [&]() -> void { currentPage = 2; });
         break;
     }
 
@@ -35,85 +35,25 @@ void MainPage::drawMainPage()
 
     if (currentPage > 0)
     {
-        drawBackButton(w, h);
+        drawButton(w - 38, h - 38, 30, 30, "<-", [&]() -> void { currentPage = 0; });
     }
 }
 
-void MainPage::drawBackButton(int w, int h)
+void MainPage::drawButton(int x, int y, int width, int height, String text, std::function<void()> onTouch)
 {
     uint16_t buttonColor;
     uint16_t fontColor;
 
-    int x1 = w - 38;
-    int y1 = h - 38;
-    int btnWidth = 30;
-    int btnHeight = 30;
+    int x1 = x;
+    int y1 = y;
+    int btnWidth = width;
+    int btnHeight = height;
     int x2 = x1 + btnWidth;
     int y2 = y1 + btnHeight;
 
-    if (touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2))
-    {
-        buttonColor = 0xC618; // lightgrey
-        currentPage = 0;      // set current page to main
-        fontColor = 0x0000;
-    }
-    else
-    {
-        buttonColor = 0x2104; // very dark grey
-        fontColor = 0xFFFF;
-    }
+    bool buttonTouched = touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2);
 
-    // draw settings button
-    tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(fontColor, buttonColor);
-    tft->setCursor(x1 + (btnWidth / 2) - 8, y1 + (btnHeight / 2) + 4);
-    tft->print("<-");
-}
-
-void MainPage::drawSettingsButton(int w, int h)
-{
-    uint16_t buttonColor;
-    uint16_t fontColor;
-
-    int x1 = 8;
-    int y1 = h - 90;
-    int btnWidth = 90;
-    int btnHeight = 82;
-    int x2 = x1 + btnWidth;
-    int y2 = y1 + btnHeight;
-
-    if (touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2))
-    {
-        buttonColor = 0xC618; // lightgrey
-        currentPage = 1;      // set current page to settings
-        fontColor = 0x0000;
-    }
-    else
-    {
-        buttonColor = 0x2104; // very dark grey
-        fontColor = 0xFFFF;
-    }
-
-    // draw settings button
-    tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(fontColor, buttonColor);
-    tft->setCursor(x1 + (btnWidth / 2) - 34, y1 + (btnHeight / 2) + 6);
-    tft->print("Settings");
-}
-
-void MainPage::drawSwitchesButton(int w, int h)
-{
-    uint16_t buttonColor;
-    uint16_t fontColor;
-
-    int x1 = 8;
-    int y1 = h - 180; // 8px above settings button
-    int btnWidth = 90;
-    int btnHeight = 82;
-    int x2 = x1 + btnWidth;
-    int y2 = y1 + btnHeight;
-
-    if (touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2))
+    if (buttonTouched)
     {
         buttonColor = 0xC618; // lightgrey
         currentPage = 2;      // set current page to switches
@@ -128,6 +68,11 @@ void MainPage::drawSwitchesButton(int w, int h)
     // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
     tft->setTextColor(fontColor, buttonColor);
-    tft->setCursor(x1 + (btnWidth / 2) - 37, y1 + (btnHeight / 2) + 6);
-    tft->print("Switches");
+    tft->setCursor((x1 + (btnWidth / 2)) - (text.length() * 5), y1 + (btnHeight / 2) + 6);
+    tft->print(text);
+
+    if (buttonTouched)
+    {
+        onTouch();
+    }
 }

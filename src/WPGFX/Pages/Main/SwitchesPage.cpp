@@ -16,6 +16,39 @@ void setSwitchState(String switchName, String state)
 #endif
 }
 
+void MainPage::drawSwitchesPage()
+{
+    if (currentSwitchId >= (sizeof(switches) / sizeof(switches[0])))
+    {
+#ifdef _debug
+        Serial.println("[Switch] Resetting currentSwitchId to 0!");
+#endif
+        currentSwitchId = 0;
+    }
+
+    MqttSwitch currentSwitch = switches[currentSwitchId];
+    drawSwitchButton(currentSwitch);
+    drawButton(8, (tft->height() / 2) - 16, 32, 32, "<", [&]() -> void {
+        if (currentSwitchId == 0)
+        {
+            currentSwitchId = (sizeof(switches) / sizeof(switches[0])) - 1;
+        }
+        else
+        {
+            currentSwitchId--;
+        }
+#ifdef _debug
+        Serial.println("[Switch] Navigating to previous switch!");
+#endif
+    });
+    drawButton((tft->width() - 40), (tft->height() / 2) - 16, 32, 32, ">", [&]() -> void {
+        currentSwitchId++;
+#ifdef _debug
+        Serial.println("[Switch] Navigating to next switch!");
+#endif
+    });
+}
+
 void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
 {
     uint16_t buttonColor;
@@ -75,106 +108,5 @@ void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
             Serial.println("[Switch] Current state of delock unknown, sending ON!");
 #endif
         }
-    }
-}
-
-void MainPage::drawSwitchesPage()
-{
-    if (currentSwitchId >= (sizeof(switches) / sizeof(switches[0])))
-    {
-#ifdef _debug
-        Serial.println("[Switch] Resetting currentSwitchId to 0!");
-#endif
-        currentSwitchId = 0;
-    }
-
-    MqttSwitch currentSwitch = switches[currentSwitchId];
-    drawPreviousSwitchButton();
-    drawSwitchButton(currentSwitch);
-    drawNextSwitchButton();
-}
-
-void MainPage::drawPreviousSwitchButton()
-{
-    uint16_t buttonColor;
-    uint16_t fontColor;
-
-    int btnWidth = 32;
-    int btnHeight = 32;
-    int x1 = 10;
-    int y1 = (tft->height() / 2) - (btnHeight / 2);
-    int x2 = x1 + btnWidth;
-    int y2 = y1 + btnHeight;
-
-    bool buttonPressed = touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2);
-
-    if (buttonPressed)
-    {
-        buttonColor = 0xC618; // lightgrey
-        fontColor = 0x0000;
-    }
-    else
-    {
-        buttonColor = 0x2104; // very dark grey
-        fontColor = 0xFFFF;
-    }
-
-    tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(fontColor, buttonColor);
-    tft->setCursor(x1 + (btnWidth / 2) - 8, y1 + (btnHeight / 2) + 6);
-    tft->print("<");
-
-    if (buttonPressed)
-    {
-        if (currentSwitchId == 0)
-        {
-            currentSwitchId = (sizeof(switches) / sizeof(switches[0])) - 1;
-        }
-        else
-        {
-            currentSwitchId--;
-        }
-#ifdef _debug
-        Serial.println("[Switch] Navigating to previous switch!");
-#endif
-    }
-}
-
-void MainPage::drawNextSwitchButton()
-{
-    uint16_t buttonColor;
-    uint16_t fontColor;
-
-    int btnWidth = 32;
-    int btnHeight = 32;
-    int x1 = (tft->width() - (btnWidth + 8));
-    int y1 = (tft->height() / 2) - (btnHeight / 2);
-    int x2 = x1 + btnWidth;
-    int y2 = y1 + btnHeight;
-
-    bool buttonPressed = touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2);
-
-    if (buttonPressed)
-    {
-        buttonColor = 0xC618; // lightgrey
-        fontColor = 0x0000;
-    }
-    else
-    {
-        buttonColor = 0x2104; // very dark grey
-        fontColor = 0xFFFF;
-    }
-
-    tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
-    tft->setTextColor(fontColor, buttonColor);
-    tft->setCursor(x1 + (btnWidth / 2) - 8, y1 + (btnHeight / 2) + 6);
-    tft->print(">");
-
-    if (buttonPressed)
-    {
-        currentSwitchId++;
-#ifdef _debug
-        Serial.println("[Switch] Navigating to next switch!");
-#endif
     }
 }

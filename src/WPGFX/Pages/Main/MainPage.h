@@ -21,14 +21,10 @@ class MainPage
     // current page (0 means main menu)
     int currentPage = 0;
 
-    void drawSettingsButton(int w, int h);
-    void drawSwitchesButton(int w, int h);
-    void drawBackButton(int w, int h);
-    
     void drawSwitchesPage();
     void drawSwitchButton(MqttSwitch currentSwitch);
-    void drawNextSwitchButton();
-    void drawPreviousSwitchButton();
+
+    void drawButton(int x, int y, int width, int height, String text, std::function<void()> onTouch);
 
 public:
     MainPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor);
