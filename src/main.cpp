@@ -159,6 +159,7 @@ void setup()
   wpbme.begin();
 
   wpgfx.setBootStatus("Connecting WiFi...");
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   WiFi.setHostname(HOSTNAME);
   while (WiFi.status() != WL_CONNECTED)
