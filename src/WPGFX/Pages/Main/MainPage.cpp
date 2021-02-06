@@ -56,7 +56,6 @@ void MainPage::drawButton(int x, int y, int width, int height, String text, std:
     if (buttonTouched)
     {
         buttonColor = 0xC618; // lightgrey
-        currentPage = 2;      // set current page to switches
         fontColor = 0x0000;
     }
     else
@@ -65,7 +64,6 @@ void MainPage::drawButton(int x, int y, int width, int height, String text, std:
         fontColor = 0xFFFF;
     }
 
-    // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
     tft->setTextColor(fontColor, buttonColor);
     tft->setCursor((x1 + (btnWidth / 2)) - (text.length() * 5), y1 + (btnHeight / 2) + 6);
