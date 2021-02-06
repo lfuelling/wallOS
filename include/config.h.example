@@ -12,6 +12,9 @@ struct MqttSwitch
 
 /////////////////// MAIN CONFIG OPTIONS ///////////////////
 
+// Device settings
+#define HOSTNAME "wallpanel"
+
 // Time settings
 #define NTP_UTC_OFFSET_SECONDS 3600 // UTC+1
 #define NTP_DAYLIGHT_OFFSET_SECONDS 3600 // 3600 for DST, 0 otherwise
