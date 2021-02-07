@@ -130,7 +130,12 @@ bool WPMQTT::reconnect()
     {
         int retries = 0;
         String mqttUser = NVS.getString("conf/mqtt/usr");
-        String mqttPass = NVS.getString("conf/mqtt/psw");
+        String mqttPass = NVS.getString("conf/mqtt/pwd");
+        #ifdef _debug
+            Serial.print("[MQTT] Connecting as: ");
+            Serial.print(mqttUser);
+            Serial.println("...");
+#endif
         while (!client->connect("Wandpanel", mqttUser.c_str(), mqttPass.c_str(), false))
         {
 #ifdef _debug
