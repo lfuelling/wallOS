@@ -19,6 +19,8 @@ class SettingsPage
     ScreenUtils *utils;
 
     void resetStorage();
+    void drawResetButton();
+    void drawFrameButton();
 
 public:
     SettingsPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor, ScreenUtils *screenUtils);

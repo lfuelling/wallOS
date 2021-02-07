@@ -122,6 +122,12 @@ void ScreenUtils::drawButton(int x, int y, int width, int height, String text, s
     }
 
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
+
+    if (NVS.getInt("conf/ui/frames") == 1)
+    {
+        tft->drawRect(x1, y1, btnWidth, btnHeight, 0xFFFF);
+    }
+
     tft->setTextColor(fontColor, buttonColor);
     tft->setCursor((x1 + (btnWidth / 2)) - ((text.length() * 4) + 3), y1 + (btnHeight / 2) + 6);
     tft->print(text);

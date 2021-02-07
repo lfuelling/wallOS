@@ -104,6 +104,12 @@ void SwitchesPage::drawSwitchButton(MqttSwitch currentSwitch)
 
     // draw settings button
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
+
+    if (NVS.getInt("conf/ui/frames") == 1)
+    {
+        tft->drawRect(x1, y1, btnWidth, btnHeight, 0xFFFF);
+    }
+
     tft->setTextColor(fontColor, buttonColor);
     tft->setCursor((x1 + (btnWidth / 2)) - (currentSwitch.switchName.length() * 5), y1 + (btnHeight / 2) + 6);
 

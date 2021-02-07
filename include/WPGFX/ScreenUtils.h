@@ -4,6 +4,7 @@
 #include "../config.h"
 #include <Arduino.h>
 #include <functional>
+#include <ArduinoNvs.h>
 
 #ifndef SCREENUTILS_H
 #define SCREENUTILS_H

@@ -2,6 +2,7 @@
 
 int resetPressCount = 0;
 bool holdingResetSwitch = false;
+bool holdingFrameSwitch = false;
 
 SettingsPage::SettingsPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor, ScreenUtils *screenUtils)
 {
@@ -36,10 +37,36 @@ void SettingsPage::resetSettingsPage()
     resetPressCount = 0;
 }
 
-void SettingsPage::drawSettingsPage()
+void SettingsPage::drawFrameButton()
 {
-    tft->setFont(&FreeSans9pt7b);
+    String resetText = String("Frames");
 
+    utils->drawButton(
+        8, tft->height() - 180, 90, 82, resetText,
+        [&]() -> void {
+            if (!holdingResetSwitch)
+            {
+                holdingResetSwitch = true;
+                if (NVS.getInt("conf/ui/frames") != 1)
+                {
+                    NVS.setInt("conf/ui/frames", 1);
+                }
+                else
+                {
+                    NVS.setInt("conf/ui/frames", 0);
+                }
+            }
+        },
+        [&]() -> void {
+            if (holdingFrameSwitch)
+            {
+                holdingFrameSwitch = false;
+            }
+        });
+}
+
+void SettingsPage::drawResetButton()
+{
     String resetText = String("Reset (" + String(-resetPressCount + 10) + ")");
 
     utils->drawButton(
@@ -48,5 +75,18 @@ void SettingsPage::drawSettingsPage()
             resetStorage();
         } else if(!holdingResetSwitch) {
             resetPressCount++;
-        } }, [&]() -> void { holdingResetSwitch = false; });
+        } },
+        [&]() -> void {
+            if (holdingResetSwitch)
+            {
+                holdingResetSwitch = false;
+            }
+        });
+}
+
+void SettingsPage::drawSettingsPage()
+{
+    tft->setFont(&FreeSans9pt7b);
+    drawResetButton();
+    drawFrameButton();
 }
