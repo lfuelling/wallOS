@@ -1,14 +1,12 @@
 #include "WPGFX/WPGFX.h"
-#include "WPGFX/ScreenUtils.h"
-#include "ArduinoNvs.h"
-#include "qrcode.h"
 
 WPGFX::WPGFX(WPBME280 *bme)
 {
     bme280 = bme;
     touch = new XPT2046_Touchscreen(TOUCH_CS, TOUCH_IRQ);
     tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
-    mainPage = new MainPage(tft, touch);
+    utils = new ScreenUtils(tft, touch);
+    mainPage = new MainPage(tft, touch, utils);
 }
 
 void WPGFX::begin()
@@ -69,7 +67,7 @@ void WPGFX::handleGraphics()
 #ifdef _debug
     if (touch->touched())
     {
-        TS_Point p = ScreenUtils().getTouchPosition(tft, touch);
+        TS_Point p = utils->getTouchPosition();
         Serial.print("[Touch] Drawing circle at ");
         Serial.print(p.x);
         Serial.print(",");

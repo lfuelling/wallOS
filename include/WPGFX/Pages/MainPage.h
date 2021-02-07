@@ -6,6 +6,8 @@
 #include "WPGFX/Fonts/FreeSans9pt7b.h"
 #include "WPGFX/Fonts/FreeMono9pt7b.h"
 #include "WPGFX/ScreenUtils.h"
+#include "WPGFX/Pages/SettingsPage.h"
+#include "WPGFX/Pages/SwitchesPage.h"
 #include "WPMQTT/WPMQTT.h"
 #include <ArduinoNvs.h>
 
@@ -16,23 +18,15 @@ class MainPage
 {
     Adafruit_ILI9341 *tft;
     XPT2046_Touchscreen *touch;
-    ScreenUtils utils;
+    ScreenUtils *utils;
+    SettingsPage *settingsPage;
+    SwitchesPage *switchesPage;
 
     // current page (0 means main menu)
     int currentPage = 0;
 
-    void drawSwitchesPage();
-    void drawSettingsPage();
-    void resetSettingsPage();
-    void drawSwitchButton(MqttSwitch currentSwitch);
-
-    void drawButton(
-        int x, int y, int width, int height, String text,
-        std::function<void()> onTouch,
-        std::function<void()> onNoTouch = []() -> void {});
-
 public:
-    MainPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor);
+    MainPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor, ScreenUtils *screenUtils);
     void drawMainPage();
 };
 

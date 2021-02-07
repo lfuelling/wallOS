@@ -1,10 +1,12 @@
 #include "WPGFX/ScreenUtils.h"
 
-ScreenUtils::ScreenUtils()
+ScreenUtils::ScreenUtils(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor)
 {
+    tft = screen;
+    touch = touchSensor;
 }
 
-TS_Point ScreenUtils::getTouchPosition(Adafruit_ILI9341 *tft, XPT2046_Touchscreen *touch)
+TS_Point ScreenUtils::getTouchPosition()
 {
     TS_Point point = touch->getPoint();
 
@@ -46,9 +48,9 @@ bool ScreenUtils::inRange(int low, int x, int high)
     return ((x - high) * (x - low) <= 0);
 }
 
-bool ScreenUtils::touchedInBounds(Adafruit_ILI9341 *tft, XPT2046_Touchscreen *touch, int x1, int y1, int x2, int y2)
+bool ScreenUtils::touchedInBounds(int x1, int y1, int x2, int y2)
 {
-    TS_Point point = getTouchPosition(tft, touch);
+    TS_Point point = getTouchPosition();
 
     bool inBoundsX = false;
     bool inBoundsY = false;
@@ -92,4 +94,44 @@ bool ScreenUtils::touchedInBounds(Adafruit_ILI9341 *tft, XPT2046_Touchscreen *to
 #endif
 
     return inBoundsX && inBoundsY;
+}
+
+void ScreenUtils::drawButton(int x, int y, int width, int height, String text, std::function<void()> onTouch, std::function<void()> onNoTouch)
+{
+    uint16_t buttonColor;
+    uint16_t fontColor;
+
+    int x1 = x;
+    int y1 = y;
+    int btnWidth = width;
+    int btnHeight = height;
+    int x2 = x1 + btnWidth;
+    int y2 = y1 + btnHeight;
+
+    bool buttonTouched = touch->touched() && touchedInBounds(x1, y1, x2, y2);
+
+    if (buttonTouched)
+    {
+        buttonColor = 0xC618; // lightgrey
+        fontColor = 0x0000;
+    }
+    else
+    {
+        buttonColor = 0x2104; // very dark grey
+        fontColor = 0xFFFF;
+    }
+
+    tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
+    tft->setTextColor(fontColor, buttonColor);
+    tft->setCursor((x1 + (btnWidth / 2)) - ((text.length() * 4) + 3), y1 + (btnHeight / 2) + 6);
+    tft->print(text);
+
+    if (buttonTouched)
+    {
+        onTouch();
+    }
+    else
+    {
+        onNoTouch();
+    }
 }

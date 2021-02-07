@@ -1,9 +1,13 @@
-#include "WPGFX/Pages/MainPage.h"
+#include "WPGFX/Pages/SwitchesPage.h"
 
-int currentSwitchId = 0;
-bool holdingSwitch = false;
+SwitchesPage::SwitchesPage(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor, ScreenUtils *screenUtils)
+{
+    tft = screen;
+    touch = touchSensor;
+    utils = screenUtils;
+}
 
-void setSwitchState(String switchName, String state)
+void SwitchesPage::setSwitchState(String switchName, String state)
 {
     bool result = NVS.setString(switchName, state);
 #ifdef _debug
@@ -17,7 +21,7 @@ void setSwitchState(String switchName, String state)
 #endif
 }
 
-void MainPage::drawSwitchesPage()
+void SwitchesPage::drawSwitchesPage()
 {
     if (currentSwitchId >= (sizeof(switches) / sizeof(switches[0])))
     {
@@ -29,28 +33,50 @@ void MainPage::drawSwitchesPage()
 
     MqttSwitch currentSwitch = switches[currentSwitchId];
     drawSwitchButton(currentSwitch);
-    drawButton(8, (tft->height() / 2) - 16, 32, 32, "<", [&]() -> void {
-        if (currentSwitchId == 0)
-        {
-            currentSwitchId = (sizeof(switches) / sizeof(switches[0])) - 1;
-        }
-        else
-        {
-            currentSwitchId--;
-        }
-#ifdef _debug
-        Serial.println("[Switch] Navigating to previous switch!");
-#endif
-    });
-    drawButton((tft->width() - 40), (tft->height() / 2) - 16, 32, 32, ">", [&]() -> void {
-        currentSwitchId++;
+    drawNextButton();
+    drawPrevButton();
+}
+
+void SwitchesPage::drawNextButton()
+{
+    utils->drawButton((tft->width() - 72), (tft->height() / 2) - 32, 64, 64, "->", [&]() -> void {
+        if(!holdingNextButton) {
+            holdingNextButton = true;
+            currentSwitchId++;
 #ifdef _debug
         Serial.println("[Switch] Navigating to next switch!");
 #endif
-    });
+        } }, [&]() -> void {
+        if (holdingNextButton) {
+            holdingNextButton = false;
+        } });
 }
 
-void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
+void SwitchesPage::drawPrevButton()
+{
+    utils->drawButton(
+        8, (tft->height() / 2) - 32, 64, 64, "<-", [&]() -> void {
+        if (!holdingPrevButton)
+        {
+            holdingPrevButton = true;
+            if (currentSwitchId == 0)
+            {
+                currentSwitchId = (sizeof(switches) / sizeof(switches[0])) - 1;
+            }
+            else
+            {
+                currentSwitchId--;
+            }
+#ifdef _debug
+            Serial.println("[Switch] Navigating to previous switch!");
+#endif
+        } }, [&]() -> void {
+        if (holdingPrevButton) {
+            holdingPrevButton = false;
+        } });
+}
+
+void SwitchesPage::drawSwitchButton(MqttSwitch currentSwitch)
 {
     uint16_t buttonColor;
     uint16_t fontColor;
@@ -63,7 +89,7 @@ void MainPage::drawSwitchButton(MqttSwitch currentSwitch)
     int y2 = y1 + btnHeight;
 
     String currentState = NVS.getString(String("s/" + currentSwitch.switchName));
-    bool buttonPressed = touch->touched() && utils.touchedInBounds(tft, touch, x1, y1, x2, y2);
+    bool buttonPressed = touch->touched() && utils->touchedInBounds(x1, y1, x2, y2);
 
     if (currentState == currentSwitch.powerOnValue || buttonPressed)
     {

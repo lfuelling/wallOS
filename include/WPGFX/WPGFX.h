@@ -8,10 +8,13 @@
 #include "Fonts/FreeMono9pt7b.h"
 #include "Fonts/Gidugu10pt7b.h"
 #include "Fonts/Electrolize9pt7b.h"
-#include "../config.h"
-#include "../WPBME280/WPBME280.h"
-#include "../WPMQTT/WPMQTT.h"
+#include "config.h"
+#include "WPBME280/WPBME280.h"
+#include "WPMQTT/WPMQTT.h"
 #include "Pages/MainPage.h"
+#include "WPGFX/ScreenUtils.h"
+#include "ArduinoNvs.h"
+#include "qrcode.h"
 
 #ifndef WPGFX_H
 #define WPGFX_H
@@ -23,6 +26,7 @@
 class WPGFX
 {
     MainPage *mainPage;
+    ScreenUtils *utils;
 
     // current location
     int tsx, tsy, tsxraw, tsyraw;

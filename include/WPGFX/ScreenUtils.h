@@ -2,6 +2,8 @@
 #include "Adafruit_ILI9341.h"
 #include <XPT2046_Touchscreen.h>
 #include "../config.h"
+#include <Arduino.h>
+#include <functional>
 
 #ifndef SCREENUTILS_H
 #define SCREENUTILS_H
@@ -14,12 +16,19 @@
 
 class ScreenUtils
 {
+    Adafruit_ILI9341 *tft;
+    XPT2046_Touchscreen *touch;
+
     bool inRange(int low, int x, int high);
 
 public:
-    ScreenUtils();
-    TS_Point getTouchPosition(Adafruit_ILI9341 *tft, XPT2046_Touchscreen *touch);
-    bool touchedInBounds(Adafruit_ILI9341 *tft, XPT2046_Touchscreen *touch, int x1, int y1, int x2, int y2);
+    ScreenUtils(Adafruit_ILI9341 *screen, XPT2046_Touchscreen *touchSensor);
+    TS_Point getTouchPosition();
+    bool touchedInBounds(int x1, int y1, int x2, int y2);
+    void drawButton(
+        int x, int y, int width, int height, String text,
+        std::function<void()> onTouch,
+        std::function<void()> onNoTouch = []() -> void {});
 };
 
 #endif
