@@ -59,7 +59,10 @@ void onMessage(String &topic, String &payload)
 
 void WPMQTT::begin()
 {
-    client->begin(MQTT_SERVER_IP, MQTT_SERVER_PORT, wifi);
+    String mqttServer = NVS.getString("conf/mqtt/srv");
+    int mqttPort = NVS.getInt("conf/mqtt/prt");
+
+    client->begin(mqttServer.c_str(), mqttPort, wifi);
     client->onMessage(onMessage);
 
     reconnect();
@@ -124,7 +127,9 @@ void WPMQTT::reconnect()
 {
     if (!client->connected())
     {
-        while (!client->connect("Wandpanel", MQTT_USERAME, MQTT_PASSWORD, false))
+        String mqttUser = NVS.getString("conf/mqtt/usr");
+        String mqttPass = NVS.getString("conf/mqtt/psw");
+        while (!client->connect("Wandpanel", mqttUser.c_str(), mqttPass.c_str(), false))
         {
 #ifdef _debug
             Serial.println("[MQTT] Connect failed! Retrying...");
@@ -169,7 +174,9 @@ void WPMQTT::handleCommand(String command)
     if (command == "version")
     {
         client->publish(MQTT_COMMAND_OUTPUT_TOPIC, WP_VERSION);
-    } else if (command == "reboot") {
+    }
+    else if (command == "reboot")
+    {
         ESP.restart();
     }
     bool result = NVS.setString("lastCommand", "none");

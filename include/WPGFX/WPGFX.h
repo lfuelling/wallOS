@@ -42,7 +42,6 @@ class WPGFX
 
     void redrawIfNecessary();
     void drawStatusBar();
-    void drawAttentionScreen();
     String getCurrentTime();
     String getSignalStrength();
     String getTemperature();
@@ -62,7 +61,7 @@ public:
     void handleGraphics();
     void showFatalError(String error, bool reboot);
     void setBootStatus(String status);
-    void setAttentionStatus(String status);
+    void drawInitialSetupScreen(String ssid, String password, String ip);
 };
 
 #endif

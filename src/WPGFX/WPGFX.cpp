@@ -1,6 +1,7 @@
 #include "WPGFX/WPGFX.h"
 #include "WPGFX/ScreenUtils.h"
 #include "ArduinoNvs.h"
+#include "qrcode.h"
 
 WPGFX::WPGFX(WPBME280 *bme)
 {
@@ -173,7 +174,7 @@ void WPGFX::setBootStatus(String status)
 }
 
 // Display the attention screen
-void WPGFX::drawAttentionScreen()
+void WPGFX::drawInitialSetupScreen(String ssid, String password, String ip)
 {
     uint16_t W, h;
     // Select the colors and font orientation
@@ -184,18 +185,45 @@ void WPGFX::drawAttentionScreen()
     W = tft->width();
     h = tft->height();
 
-    tft->setCursor(W / 2 - 64, h / 2 + 9);
-    tft->println("-         -");
-    tft->setCursor(W / 2 - 64, h / 2 + 18);
-    tft->println(" \\_(*.*)_/ ");
+    QRCode qrcode;
+    uint8_t qrcodeData[qrcode_getBufferSize(3)];
+    String wifiQRData = String("WIFI:T:WPA;S:" + ssid + ";P:" + password + ";;");
+    qrcode_initText(&qrcode, qrcodeData, 3, 0, wifiQRData.c_str());
 
-    tft->setCursor(W / 2 - (bootStatus.length() * 5), h / 2 + 40);
-    tft->println(bootStatus);
-    tft->setFont(&FreeMono9pt7b);
-}
+    int qrCodePixelSize = 4;
+    int qrCodeOffsetX = (W / 2) - ((qrcode.size * (qrCodePixelSize - 1)) / 2);
+    int qrCodeOffsetY = 8;
 
-void WPGFX::setAttentionStatus(String status)
-{
-    bootStatus = status;
-    drawAttentionScreen();
+    for (uint8_t y = 0; y < qrcode.size; y++)
+    {
+        for (uint8_t x = 0; x < qrcode.size; x++)
+        {
+            if (qrcode_getModule(&qrcode, x, y))
+            {
+                tft->fillRect(
+                    qrCodeOffsetX + (x * (x == 0 ? 0 : qrCodePixelSize)),
+                    qrCodeOffsetY + (y * (y == 0 ? 0 : qrCodePixelSize)),
+                    qrCodePixelSize, qrCodePixelSize, 0x0000);
+            }
+            else
+            {
+                tft->fillRect(
+                    qrCodeOffsetX + (x * (x == 0 ? 0 : qrCodePixelSize)),
+                    qrCodeOffsetY + (y * (y == 0 ? 0 : qrCodePixelSize)),
+                    qrCodePixelSize, qrCodePixelSize, 0xFFFF);
+            }
+        }
+    }
+
+    String infoText = String(">> Initial Setup <<");
+    tft->setCursor(W / 2 - (infoText.length() * 5), h / 2 + 40);
+    tft->println(infoText);
+
+    String wifiText = String(ssid + " / " + password);
+    tft->setCursor(W / 2 - (wifiText.length() * 5), h / 2 + 56);
+    tft->println(wifiText);
+
+    String ipText = String(ip);
+    tft->setCursor(W / 2 - (ipText.length() * 5), h / 2 + 72);
+    tft->println(ipText);
 }
