@@ -18,7 +18,7 @@ void MainPage::drawMainPage()
         drawSwitchesPage();
         break;
     case 1:
-        // TODO: draw settings page
+        drawSettingsPage();
         break;
     case 0:
     default:
@@ -35,11 +35,17 @@ void MainPage::drawMainPage()
 
     if (currentPage > 0)
     {
-        drawButton(w - 38, h - 38, 30, 30, "<-", [&]() -> void { currentPage = 0; });
+        drawButton(w - 38, h - 38, 30, 30, "<-", [&]() -> void {
+            if (currentPage == 1)
+            {
+                resetSettingsPage();
+            }
+            currentPage = 0;
+        });
     }
 }
 
-void MainPage::drawButton(int x, int y, int width, int height, String text, std::function<void()> onTouch)
+void MainPage::drawButton(int x, int y, int width, int height, String text, std::function<void()> onTouch, std::function<void()> onNoTouch)
 {
     uint16_t buttonColor;
     uint16_t fontColor;
@@ -66,11 +72,15 @@ void MainPage::drawButton(int x, int y, int width, int height, String text, std:
 
     tft->fillRect(x1, y1, btnWidth, btnHeight, buttonColor);
     tft->setTextColor(fontColor, buttonColor);
-    tft->setCursor((x1 + (btnWidth / 2)) - (text.length() * 5), y1 + (btnHeight / 2) + 6);
+    tft->setCursor((x1 + (btnWidth / 2)) - ((text.length() * 4) + 3), y1 + (btnHeight / 2) + 6);
     tft->print(text);
 
     if (buttonTouched)
     {
         onTouch();
+    }
+    else
+    {
+        onNoTouch();
     }
 }

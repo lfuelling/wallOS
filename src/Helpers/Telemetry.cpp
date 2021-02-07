@@ -11,7 +11,7 @@ void Telemetry::publishTelemetry(int photoresistorVal)
     String hostname = NVS.getString("conf/host");
 
 #ifdef _debug
-    Serial.println(String("[MQTT] sending telemetry for" + hostname + "..."));
+    Serial.println(String("[MQTT] sending telemetry for " + hostname + "..."));
 #endif
 
     String mqttTopic = String("tele/" + hostname + "/");
