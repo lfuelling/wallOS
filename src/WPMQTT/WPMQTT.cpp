@@ -29,7 +29,10 @@ void onMessage(String &topic, String &payload)
     Serial.println(payload);
 #endif
 
-    if (topic == MQTT_COMMAND_TOPIC)
+    String hostname = NVS.getString("conf/host");
+    String mqttTopic = String("cmnd/" + hostname + "/");
+
+    if (topic == mqttTopic)
     {
 #ifdef _debug
         Serial.print("[MQTT] Command received: ");
@@ -86,8 +89,12 @@ void WPMQTT::loop()
 
     if (!client->connected())
     {
-        // TODO: maybe some error handling might be a good idea here
-        bool res = reconnect();
+        if (!reconnect())
+        {
+#ifdef _debug
+            Serial.println("[MQTT] Loop: Reconnect unsusccessful!");
+#endif
+        }
     }
 
     // Handle MQTT command
@@ -131,10 +138,10 @@ bool WPMQTT::reconnect()
         int retries = 0;
         String mqttUser = NVS.getString("conf/mqtt/usr");
         String mqttPass = NVS.getString("conf/mqtt/pwd");
-        #ifdef _debug
-            Serial.print("[MQTT] Connecting as: ");
-            Serial.print(mqttUser);
-            Serial.println("...");
+#ifdef _debug
+        Serial.print("[MQTT] Connecting as: ");
+        Serial.print(mqttUser);
+        Serial.println("...");
 #endif
         while (!client->connect("Wandpanel", mqttUser.c_str(), mqttPass.c_str(), false))
         {
@@ -153,7 +160,9 @@ bool WPMQTT::reconnect()
         Serial.println("[MQTT] Connected!");
 #endif
 
-        subscribe(MQTT_COMMAND_TOPIC);
+        String hostname = NVS.getString("conf/host");
+        String mqttTopic = String("cmnd/" + hostname + "/");
+        subscribe(mqttTopic);
 
         for (int i = 0; i < (sizeof(switches) / sizeof(switches[0])); i++)
         {
@@ -184,9 +193,12 @@ void WPMQTT::subscribe(String topic)
 
 void WPMQTT::handleCommand(String command)
 {
+    String hostname = NVS.getString("conf/host");
+    String mqttTopic = String("cmnd/" + hostname + "/out");
+
     if (command == "version")
     {
-        client->publish(MQTT_COMMAND_OUTPUT_TOPIC, WP_VERSION);
+        client->publish(mqttTopic, WP_VERSION);
     }
     else if (command == "reboot")
     {

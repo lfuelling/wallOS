@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #ifndef WP_CONFIG_H
 #define WP_CONFIG_H
 
@@ -12,33 +14,21 @@ struct MqttSwitch
 
 /////////////////// MAIN CONFIG OPTIONS ///////////////////
 
-// Device settings
-#define HOSTNAME "wallpanel"
-
 // Time settings
-#define NTP_UTC_OFFSET_SECONDS 3600 // UTC+1
+#define NTP_UTC_OFFSET_SECONDS 3600      // UTC+1
 #define NTP_DAYLIGHT_OFFSET_SECONDS 3600 // 3600 for DST, 0 otherwise
 #define NTP_SERVER_HOSTNAME "pool.ntp.org"
 
 // BME280 Settings
-#define SEALEVELPRESSURE_HPA (1013.25)
+#define SEALEVELPRESSURE_HPA (1013.25) // This changes with the weather :c
+// TODO: Find a way to get this value using internet
 
-// WiFi settings
-#define WIFI_SSID "wifiname"
-#define WIFI_PASSWORD "wifipassword"
-
-// MQTT settings
-#define MQTT_SERVER_IP IPAddress(192, 168, 1, 101)
-#define MQTT_SERVER_PORT 1883
-#define MQTT_USERAME "mqttusername"
-#define MQTT_PASSWORD "mqttpassword"
+// MQTT Settings
 #define MQTT_CONNECT_COOLDOWN 2000
-#define MQTT_COMMAND_TOPIC "esp32/command"
-#define MQTT_COMMAND_OUTPUT_TOPIC "esp32/command/out"
 #define MQTT_TELEMETRY_INTERVAL_MS 5000
 #define MQTT_QOS_LEVEL 2
 
-// List of MQTT Switches
+// List of MQTT Switches, see MqttSwitch struct above
 static const MqttSwitch switches[] = {
     {"Switch 1", "cmnd/s1/POWER", "stat/s1/POWER", "ON", "OFF"},
     {"Switch 2", "cmnd/s2/POWER", "stat/s2/POWER", "ON", "OFF"}};
