@@ -57,7 +57,7 @@ void onMessage(String &topic, String &payload)
     }
 }
 
-void WPMQTT::begin()
+bool WPMQTT::begin()
 {
     String mqttServer = NVS.getString("conf/mqtt/srv");
     int mqttPort = NVS.getInt("conf/mqtt/prt");
@@ -65,7 +65,7 @@ void WPMQTT::begin()
     client->begin(mqttServer.c_str(), mqttPort, wifi);
     client->onMessage(onMessage);
 
-    reconnect();
+    return reconnect();
 }
 
 void WPMQTT::publishMessage(String topic, String message)
@@ -86,7 +86,8 @@ void WPMQTT::loop()
 
     if (!client->connected())
     {
-        reconnect();
+        // TODO: maybe some error handling might be a good idea here
+        bool res = reconnect();
     }
 
     // Handle MQTT command
@@ -123,10 +124,11 @@ void WPMQTT::handleSwitch(String nvsKey, String topic)
     }
 }
 
-void WPMQTT::reconnect()
+bool WPMQTT::reconnect()
 {
     if (!client->connected())
     {
+        int retries = 0;
         String mqttUser = NVS.getString("conf/mqtt/usr");
         String mqttPass = NVS.getString("conf/mqtt/psw");
         while (!client->connect("Wandpanel", mqttUser.c_str(), mqttPass.c_str(), false))
@@ -135,6 +137,11 @@ void WPMQTT::reconnect()
             Serial.println("[MQTT] Connect failed! Retrying...");
 #endif
             delay(800);
+            retries++;
+            if (retries > 100)
+            {
+                return false;
+            }
         }
 
 #ifdef _debug
@@ -149,6 +156,7 @@ void WPMQTT::reconnect()
             subscribe(s.statusTopic);
         }
     }
+    return true;
 }
 
 void WPMQTT::subscribe(String topic)

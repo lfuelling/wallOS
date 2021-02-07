@@ -14,7 +14,7 @@ class WPMQTT
     WPBME280 *bme280;
     WiFiClientSecure wifi;
 
-    void reconnect();
+    bool reconnect();
     void callback(char *topic, byte *message, unsigned int length);
     void handleCommand(String command);
     void subscribe(String topic);
@@ -23,7 +23,7 @@ class WPMQTT
 
 public:
     WPMQTT(WPBME280 *bme280);
-    void begin();
+    bool begin();
     void publishMessage(String topic, String message);
     void loop();
 };

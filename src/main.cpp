@@ -126,7 +126,7 @@ void publishTelemetry()
   lastTelemetryReport = millis();
 }
 
-void continueBoot()
+bool continueBoot()
 {
   wpgfx.setBootStatus("Initializing storage...");
   initializeStorage();
@@ -146,6 +146,7 @@ void continueBoot()
   String wifiHost = NVS.getString("conf/host");
   WiFi.begin(wifiSsid.c_str(), wifiPass.c_str());
   WiFi.setHostname(wifiHost.c_str());
+  int wifiConnectCount = 0;
   while (WiFi.status() != WL_CONNECTED)
   {
 #ifdef _debug
@@ -154,6 +155,11 @@ void continueBoot()
     Serial.println("...");
 #endif
     delay(800);
+    wifiConnectCount++;
+    if (wifiConnectCount > 200)
+    {
+      return false;
+    }
   }
 
   wpgfx.setBootStatus("Syncing NTP...");
@@ -173,7 +179,10 @@ void continueBoot()
 #endif
 
   wpgfx.setBootStatus("Connecting MQTT...");
-  wpmqtt.begin();
+  if (!wpmqtt.begin())
+  {
+    return false;
+  }
 
   wpgfx.setBootStatus("Startup complete!");
 
@@ -186,6 +195,7 @@ void continueBoot()
       2,              /* Priority of the task */
       &graphicsTask,  /* Task handle. */
       0);             /* Core where the task should run */
+  return true;
 }
 
 String getRandomString(int length)
@@ -356,7 +366,18 @@ void setup()
   }
   else
   {
-    continueBoot();
+    bool bootSuccessFul = continueBoot();
+    if (!bootSuccessFul)
+    {
+      wpgfx.showFatalError("Boot failed! Launching Setup...", true);
+      NVS.eraseAll();
+      delay(20);
+      NVS.commit();
+      delay(20);
+      NVS.close();
+      delay(25);
+      ESP.restart();
+    }
   }
 }
 

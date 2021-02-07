@@ -51,7 +51,7 @@ void WPGFX::showFatalError(String error, bool reboot)
     tft->println(" \\_(x.x)_/ ");
 
     tft->setFont(&gidugu10pt7b);
-    tft->setCursor(W / 2 - 56, h / 2 + 40);
+    tft->setCursor(W / 2 - (error.length() * 3), h / 2 + 40);
     tft->println(error);
     tft->setFont(&FreeMono9pt7b);
 
