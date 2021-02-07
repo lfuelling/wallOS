@@ -58,6 +58,6 @@ static const MqttSwitch switches[] = {
 /////////////////// MISC CONFIG OPTIONS ///////////////////
 
 // This will be changed when there's time (and a need)
-#define WP_VERSION "0.0-pre"
+#define WP_VERSION "1.0.0"
 
 #endif
