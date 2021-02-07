@@ -191,7 +191,7 @@ void WPGFX::drawInitialSetupScreen(String ssid, String password, String ip)
     qrcode_initText(&qrcode, qrcodeData, 3, 0, wifiQRData.c_str());
 
     int qrCodePixelSize = 4;
-    int qrCodeOffsetX = (W / 2) - ((qrcode.size * (qrCodePixelSize - 1)) / 2);
+    int qrCodeOffsetX = (W / 2) - ((qrcode.size * qrCodePixelSize) / 2);
     int qrCodeOffsetY = 8;
 
     for (uint8_t y = 0; y < qrcode.size; y++)
