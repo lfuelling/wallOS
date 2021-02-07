@@ -369,13 +369,24 @@ void setup()
     bool bootSuccessFul = continueBoot();
     if (!bootSuccessFul)
     {
-      wpgfx.showFatalError("Boot failed! Launching Setup...", true);
-      NVS.eraseAll();
+#ifdef _debug
+      Serial.println("Boot failed!");
+#endif
+      wpgfx.showFatalError("Boot failed! Launching Setup...", false);
+#ifdef _debug
+      Serial.println("Erasing NVS...");
+#endif
+      NVS.eraseAll(true);
       delay(20);
-      NVS.commit();
-      delay(20);
+#ifdef _debug
+      Serial.println("Closing NVS...");
+#endif
       NVS.close();
-      delay(25);
+      delay(250);
+#ifdef _debug
+      Serial.println("Rebooting...");
+#endif
+      delay(20);
       ESP.restart();
     }
   }
